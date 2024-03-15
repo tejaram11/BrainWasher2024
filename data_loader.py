@@ -141,7 +141,7 @@ def get_dataloader(train_root_dir, valid_root_dir,
         'valid': transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize(299),
-            transforms.CenterCrop(448),
+            #transforms.CenterCrop(448),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])])}
@@ -150,15 +150,19 @@ def get_dataloader(train_root_dir, valid_root_dir,
         'train': TripletFaceDataset(root_dir=train_root_dir,
                                     csv_name=train_csv_name,
                                     num_triplets=num_train_triplets,
-                                    transform=data_transforms['train'])
+                                    transform=data_transforms['train']),
+        'valid': TripletFaceDataset(root_dir=valid_root_dir, 
+                                    csv_name=valid_csv_name, 
+                                    num_triplets=num_valid_triplets,
+                                    transform=data_transforms['valid'])
         
         }
         
 
     dataloaders = {
         x: torch.utils.data.DataLoader(face_dataset[x], batch_size=batch_size, shuffle=False, num_workers=num_workers)
-        #for x in ['train', 'valid']}
-        for x in ['train']}
+        for x in ['train', 'valid']}
+        #for x in ['train']}
     #data_size = {x: len(face_dataset[x]) for x in ['train', 'valid']}
     data_size={x:len(face_dataset[x]) for x in ['train']} 
     return dataloaders, data_size

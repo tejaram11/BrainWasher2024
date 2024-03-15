@@ -5,16 +5,19 @@ Created on Tue Feb 27 10:55:08 2024
 @author: TEJA
 """
 
-import argparse
+
 import datetime
 import time
+import os
 
 from tqdm import tqdm
+import pandas as pd
 import numpy as np
 import torch
 import torch.optim as optim
 from torch.nn.modules.distance import PairwiseDistance
 from torch.optim import lr_scheduler
+import torch_xla.core.xla_model as xm
 #from pretrainedmodels import inceptionresnetv2
 
 
@@ -23,27 +26,33 @@ from utils_inceptionresnetv2 import InceptionResNetV2
 from loss import TripletLoss
 from data_loader import get_dataloader
 from eval_metrics import evaluate, plot_roc
+from write_csv_for_making_dataset import write_csv
 
-torch.cuda.empty_cache()
+
 
 
 learning_rate=0.01
 step_size=50
 num_epochs=50
 margin = 0 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
 
-train_root_dir="E:/programmer me/unlearning/datasets/faces_webface_112x112/MS1M_112x112"
+train_root_dir="./datasets/faces_webface_112x112/MS1M_112x112"
 valid_root_dir=""
-train_csv_name= "E:/programmer me/unlearning/code/master/files/casia_details_final.csv"
+train_csv_name= "./files/casia_details_final.csv"
 valid_csv_name= ""
 num_train_triplets= 10000
 num_valid_triplets= 10000
 batch_size=16
 num_workers=1
 num_classes=10572
+unfreeze=[]
+
+os.environ['PJRT_DEVICE']='TPU'
+
+device=xm.xla_device()
 
 
 
@@ -51,9 +60,10 @@ num_classes=10572
 def main():
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
-    import pandas as pd
+    
     valid = pd.read_csv('log/valid.csv')
     max_acc = valid['acc'].max()
+    
 
     #pretrain = args.pretrain
     #fc_only = args.fc_only
@@ -104,14 +114,14 @@ def main():
 
 
 def save_last_checkpoint(state):
-    torch.save(state, 'log/last_checkpoint.pth')
+    xm.save(state, 'log/last_checkpoint.pth')
 
 def save_if_best(state, acc):
     modelsaver.save_if_best(acc, state)
     
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
-     #for phase in ['train', 'valid']:
-    for phase in ['train']:
+     for phase in ['train', 'valid']:
+    #for phase in ['train']:
 
         labels, distances = [], []
         triplet_loss_sum = 0.0
@@ -170,8 +180,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 if phase == 'train':
                     optimizer.zero_grad()
                     triplet_loss.backward()
-                    optimizer.step()
-
+                    #optimizer.step()
+                    xm.optimizer_step(optimizer)
                 distances.append(pos_dist.data.cpu().numpy())
                 labels.append(np.ones(pos_dist.size(0)))
 
@@ -190,8 +200,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         lr = '_'.join(map(str, scheduler.get_lr()))
-        #layers = '+'.join(args.unfreeze.split(','))
-        #write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss, layers, batch_size, lr])
+        layers = '+'.join(unfreeze.split(','))
+        write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss, layers, batch_size, lr])
 
         if phase == 'valid':
             save_last_checkpoint({'epoch': epoch,
