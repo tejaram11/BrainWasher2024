@@ -1,5 +1,5 @@
 import os
-
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import torch
@@ -11,6 +11,7 @@ from torchvision import transforms
 class TripletFaceDataset(Dataset):
 
     def __init__(self, root_dir, csv_name, num_triplets, transform=None):
+        print("intializing dataset")
 
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_name,dtype={'id': object, 'name': object, 'class': object})
@@ -23,6 +24,7 @@ class TripletFaceDataset(Dataset):
 
     @staticmethod
     def generate_triplets(df, num_triplets):
+        print("generating triplets")
 
         def make_dictionary_for_face_class(df):
 
@@ -40,7 +42,7 @@ class TripletFaceDataset(Dataset):
         classes = df['class'].unique()
         face_classes = make_dictionary_for_face_class(df)
 
-        for _ in range(num_triplets):
+        for _ in tqdm(range(num_triplets), desc="Triplets", total=num_triplets, unit="triplets"):
 
             '''
               - randomly choose anchor, positive and negative images for triplet loss
@@ -99,9 +101,9 @@ class TripletFaceDataset(Dataset):
         anc_id, pos_id, neg_id, pos_class, neg_class, pos_name, neg_name, anc_ext, pos_ext, neg_ext = \
             self.training_triplets[idx]
        
-        anc_img = os.path.join(self.root_dir, str(pos_class), str(anc_id) + f'.{anc_ext}')
-        pos_img = os.path.join(self.root_dir, str(pos_class), str(pos_id) + f'.{pos_ext}')
-        neg_img = os.path.join(self.root_dir, str(neg_class), str(neg_id) + f'.{neg_ext}')
+        anc_img = os.path.join(self.root_dir, str(pos_class), str(anc_id) + f'{anc_ext}')
+        pos_img = os.path.join(self.root_dir, str(pos_class), str(pos_id) + f'{pos_ext}')
+        neg_img = os.path.join(self.root_dir, str(neg_class), str(neg_id) + f'{neg_ext}')
         
         
         anc_img = io.imread(anc_img)

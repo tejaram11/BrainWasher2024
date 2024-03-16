@@ -216,6 +216,7 @@ class Block8(nn.Module):
 class InceptionResNetV2(nn.Module):
 
     def __init__(self, num_classes,embedding_size=128):
+        print("Intializing model")
         super(InceptionResNetV2, self).__init__()
         self.num_classes=num_classes
         self.embedding_size=embedding_size

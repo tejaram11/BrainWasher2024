@@ -1,0 +1,11 @@
+datetime
+tqdm
+pandas
+numpy
+scikit-image
+torchvision
+scipy
+scikit-learn
+visdom
+path
+multitasking
