@@ -20,6 +20,7 @@ from loss import TripletLoss
 from data_loader import get_dataloader
 from eval_metrics import evaluate, plot_roc
 from write_csv_for_making_dataset import write_csv
+from train import train_valid
 
 import os
 os.environ['PJRT_DEVICE']='TPU'
@@ -27,7 +28,7 @@ os.environ['PJRT_DEVICE']='TPU'
 import torch_xla.distributed.parallel_loader as pl
 import torch_xla.distributed.xla_multiprocessing as xmp
 
-learning_rate=0.01*
+learning_rate=0.01*xm.xrt_world_size()
 step_size=50
 num_epochs=50
 margin = 0.1 
@@ -41,14 +42,16 @@ train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 4096
 num_valid_triplets= 4096
-batch_size=128
+batch_size=32
 num_workers=4
 num_classes=10572
 unfreeze=[]
 
+device=xm.xla_device()
+
 os.environ['PJRT_DEVICE']='TPU'
 
-device=xm.xla_device()
+
 
 def save_last_checkpoint(state):
     xm.save(state, 'log/last_checkpoint.pth')
@@ -111,4 +114,5 @@ def _mp_fn(index):
     print(80 * '=')
 
 if __name__== '__main__':
-    xmp.spawm(_mp_fn,args=())
+    
+    xmp.spawn(_mp_fn,args=())
