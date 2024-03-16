@@ -223,7 +223,7 @@ class InceptionResNetV2(nn.Module):
     
         # Special attributes
         self.input_space = None
-        self.input_size = (299, 299, 3)
+        self.input_size = (112, 112, 3)
         self.mean = None
         self.std = None
         # Modules
