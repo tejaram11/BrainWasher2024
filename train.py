@@ -94,7 +94,7 @@ def main():
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
         print("Training interrupted. Saving model...")
-        torch.save(translator.state_dict(), colab_dir+"models/interrupted_model.pt")
+        torch.save(model.state_dict(), colab_dir+"models/interrupted_model.pt")
         torch.save(optimizer.state_dict(),colab_dir+"models/optimizer_state.pt")
         print(batch_num,epoch)
         sys.exit(0)
@@ -123,7 +123,7 @@ def main():
 
     except:
         print("Training excepted. Saving model...")
-        torch.save(translator.state_dict(), colab_dir+"models/interrupted_model_except.pt")
+        torch.save(model.state_dict(), colab_dir+"models/interrupted_model_except.pt")
         torch.save(optimizer.state_dict(),colab_dir+"models/optimizer_state.pt")
         print(batch_num,epoch)
 
