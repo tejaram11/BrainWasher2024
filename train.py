@@ -40,10 +40,11 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
 
+colab_dir="/content/drive/MyDrive/unlearning/BrainWasher/"
 train_root_dir="/content/drive/MyDrive/unlearning/MS1M_112x112"
 valid_root_dir="/content/drive/MyDrive/unlearning/aligned"
-train_csv_name= "files/casia_full.csv"
-valid_csv_name= "files/lfwd.csv"
+train_csv_name= colab_dir+"files/casia_full.csv"
+valid_csv_name= colab_dir+"files/lfwd.csv"
 num_train_triplets= 4096
 num_valid_triplets= 4096
 batch_size=64
@@ -59,10 +60,10 @@ unfreeze=[]
 
 
 def main():
-    init_log_just_created("log/valid.csv")
-    init_log_just_created("log/train.csv")
+    init_log_just_created(colab_dir+"log/valid.csv")
+    init_log_just_created(colab_dir+"log/train.csv")
     
-    valid = pd.read_csv('log/valid.csv')
+    valid = pd.read_csv(colab_dir+'log/valid.csv')
     max_acc = valid['acc'].max()
     
 
@@ -93,8 +94,8 @@ def main():
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
         print("Training interrupted. Saving model...")
-        torch.save(translator.state_dict(), 'models/interrupted_model.pt')
-        torch.save(optimizer.state_dict(),'models/optimizer_state.pt')
+        torch.save(translator.state_dict(), colab_dir+"models/interrupted_model.pt")
+        torch.save(optimizer.state_dict(),colab_dir+"models/optimizer_state.pt")
         print(batch_num,epoch)
         sys.exit(0)
 
@@ -122,13 +123,13 @@ def main():
 
     except:
         print("Training excepted. Saving model...")
-        torch.save(translator.state_dict(), 'models/interrupted_model_except.pt')
-        torch.save(optimizer.state_dict(),'models/optimizer_state.pt')
+        torch.save(translator.state_dict(), colab_dir+"models/interrupted_model_except.pt")
+        torch.save(optimizer.state_dict(),colab_dir+"models/optimizer_state.pt")
         print(batch_num,epoch)
 
 
 def save_last_checkpoint(state):
-    torch.save(state, 'log/last_checkpoint.pth')
+    torch.save(state, colab_dir+"log/last_checkpoint.pth")
 
 def save_if_best(state, acc):
     modelsaver.save_if_best(acc, state)
