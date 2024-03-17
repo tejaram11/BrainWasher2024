@@ -33,10 +33,10 @@ from write_csv_for_making_dataset import write_csv
 
 
 learning_rate=0.01
-step_size=50
+step_size=20
 num_epochs=50
-margin = 0.1 
-#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+margin = 0.5
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
 
@@ -47,13 +47,13 @@ valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 4096
 num_valid_triplets= 4096
 batch_size=128
-num_workers=4
+num_workers=8
 num_classes=10572
 unfreeze=[]
 
 os.environ['PJRT_DEVICE']='TPU'
 
-device=xm.xla_device()
+#device=xm.xla_device()
 
 
 
@@ -91,10 +91,20 @@ def main():
     
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,eps=1e-08,weight_decay=1e-5)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
+    def handle_interrupt(signal, frame):
+        print("Training interrupted. Saving model...")
+        torch.save(translator.state_dict(), 'models/interrupted_model.pt')
+        torch.save(optimizer.state_dict(),'models/optimizer_state.pt')
+        print(batch_num,epoch)
+        sys.exit(0)
+
+    # Register the Ctrl+C signal handler
+    signal.signal(signal.SIGINT, handle_interrupt)
 
     
-
-    for epoch in range(0, num_epochs):
+    try:
+     model = torch.nn.DataParallel(model)
+     for epoch in range(0, num_epochs):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, num_epochs))
 
@@ -106,14 +116,19 @@ def main():
         print("data loaded")
         print(f'  Execution time                 = {time.time() - time0}')
         
-
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
         print(f'  Execution time                 = {time.time() - time0}')
-    print(80 * '=')
+     print(80 * '=')
+
+    except:
+        print("Training excepted. Saving model...")
+        torch.save(translator.state_dict(), 'models/interrupted_model_except.pt')
+        torch.save(optimizer.state_dict(),'models/optimizer_state.pt')
+        print(batch_num,epoch)
 
 
 def save_last_checkpoint(state):
-    xm.save(state, 'log/last_checkpoint.pth')
+    torch.save(state, 'log/last_checkpoint.pth')
 
 def save_if_best(state, acc):
     modelsaver.save_if_best(acc, state)
@@ -145,7 +160,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
             if batch_idx % 1 == 0:  # Print every 100 batches
-                xm.master_print(met.metrics_report())
+                #xm.master_print(met.metrics_report())
                 print(f"Batch [{batch_idx}/{len(dataloaders[phase])}]")
 
             anc_img = batch_sample['anc_img'].to(device)
@@ -210,17 +225,18 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 if phase == 'train':
                     optimizer.zero_grad()
                     triplet_loss.backward()
-                    #optimizer.step()
-                    xm.optimizer_step(optimizer)
+                    optimizer.step()
+                    #xm.optimizer_step(optimizer)
                     print("backprop")
                 print(f'  Execution time                 = {time.time() - time0}')
-        distances.append(pos_dist.data.cpu().numpy())
-        labels.append(np.ones(pos_dist.size(0)))
+            
+                distances.append(pos_dist.data.cpu().numpy())
+                labels.append(np.ones(pos_dist.size(0)))
 
-        distances.append(neg_dist.data.cpu().numpy())
-        labels.append(np.zeros(neg_dist.size(0)))
+                distances.append(neg_dist.data.cpu().numpy())
+                labels.append(np.zeros(neg_dist.size(0)))
 
-        triplet_loss_sum += triplet_loss.item()
+                triplet_loss_sum += triplet_loss.item()
         
         scheduler.step()
         if scheduler.last_epoch % scheduler.step_size == 0:
