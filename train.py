@@ -40,7 +40,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
 
-colab_dir="/content/drive/MyDrive/unlearning/BrainWasher/"
+colab_dir="/content/drive/MyDrive/unlearning/BrainWasher2024/"
 train_root_dir="/content/drive/MyDrive/unlearning/MS1M_112x112"
 valid_root_dir="/content/drive/MyDrive/unlearning/aligned"
 train_csv_name= colab_dir+"files/casia_full.csv"
