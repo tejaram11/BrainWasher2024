@@ -40,18 +40,18 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
 
-train_root_dir="/home/TEJA/datasets/MS1M_112x112"
-valid_root_dir="/home/TEJA/datasets/aligned"
+train_root_dir="/content/drive/MyDrive/unlearning/MS1M_112x112"
+valid_root_dir="/content/drive/MyDrive/unlearning/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 4096
 num_valid_triplets= 4096
-batch_size=128
+batch_size=64
 num_workers=8
 num_classes=10572
 unfreeze=[]
 
-os.environ['PJRT_DEVICE']='TPU'
+#os.environ['PJRT_DEVICE']='TPU'
 
 #device=xm.xla_device()
 
