@@ -17,8 +17,8 @@ import torch
 import torch.optim as optim
 from torch.nn.modules.distance import PairwiseDistance
 from torch.optim import lr_scheduler
-import torch_xla.core.xla_model as xm
-import torch_xla.debug.metrics as met
+#import torch_xla.core.xla_model as xm
+#import torch_xla.debug.metrics as met
 #from pretrainedmodels import inceptionresnetv2
 
 
