@@ -42,14 +42,14 @@ l2_dist = PairwiseDistance(2)
 
 
 
-
-train_root_dir="E:/programmer me/unlearning/datasets/faces_webface_112x112/MS1M_112x112"
-valid_root_dir="E:/programmer me/unlearning/datasets/aligned"
-train_csv_name= "files/casia_full.csv"
-valid_csv_name= "files/lfwd.csv"
+kaggle_dir= "/kaggle/working/BrainWasher2024/"
+train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
+valid_root_dir="/kaggle/input/cplfw/aligned"
+train_csv_name= kaggle_dir+"files/casia_full.csv"
+valid_csv_name= kaggle_dir+"files/lfwd.csv"
 num_train_triplets= 4096
 num_valid_triplets= 4096
-batch_size=16
+batch_size=128
 num_workers=1
 
 num_classes=10572
