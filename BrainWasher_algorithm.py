@@ -10,21 +10,26 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from train import train_valid
+from torch.optim.lr_scheduler import CosineAnnealingLR,StepLR
+from loss import TripletLoss
 
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu' 
+DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu' 
+print(DEVICE)
 
-from torch.optim.lr_scheduler import CosineAnnealingLR
+
+
 class BrainWasher:
     def __init__(self,USE_MOCK=False):
         self.USE_MOCK=USE_MOCK
         
-    def evaluation(self,net, dataloader, criterion, device = 'cuda'): ##evaluation function
+    def evaluation(self,net, dataloader, criterion, device = 'cuda:0'): ##evaluation function
         net.eval()
         total_samp = 0
         total_acc = 0
         total_loss = 0.0
         for sample in dataloader:
-            images, labels = sample['image'].to(device), sample['age_group'].to(device)
+            images, labels = sample['image'].to(device), sample['label'].to(device)
             _pred = net(images)
             total_samp+=len(labels)
             #print(f'total_samp={total_samp}')
@@ -47,21 +52,24 @@ class BrainWasher:
             retain_loader,
             forget_loader,
             validation_loader,
+            triplet_loader,
             ):
         """Simple unlearning by finetuning."""
         print('-----------------------------------')
         epochs = 8
-        retain_bs = 256
+        retain_bs = 32
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.SGD(net.parameters(), lr=0.005,
                               momentum=0.9, weight_decay=0)
-        optimizer_retain = optim.SGD(net.parameters(), lr=0.001*retain_bs/64, momentum=0.9, weight_decay=1e-2)
+        optimizer_retain = optim.Adam(net.parameters(), lr=0.001*retain_bs/64, momentum=0.9, weight_decay=1e-2)
         ##the learning rate is associated with the batchsize we used
         optimizer_forget = optim.SGD(net.parameters(), lr=3e-4, momentum=0.9, weight_decay=0)
         total_step = int(len(forget_loader)*epochs)
         retain_ld = DataLoader(retain_loader.dataset, batch_size=retain_bs, shuffle=True)
-        retain_ld4fgt = DataLoader(retain_loader.dataset, batch_size=256, shuffle=True)
+        retain_ld4fgt = DataLoader(retain_loader.dataset, batch_size=32, shuffle=True)
         scheduler = CosineAnnealingLR(optimizer_forget, T_max=total_step, eta_min=1e-6)
+        scheduler_finetune= StepLR(optimizer_retain,step_size=20, gamma=0.1)
+        triplet_loss=TripletLoss(0.5).to(DEVICE)
         if self.USE_MOCK: ##Use some Local Metric as reference
             net.eval()
             print('Forget')
@@ -98,7 +106,9 @@ class BrainWasher:
                 optimizer_forget.step()
                 scheduler.step()
             for sample in retain_ld: ##Retain Round
+                train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,1)
                 
+            '''
                 inputs, labels = sample["image"],sample["age_group"]
                 inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
                 optimizer_retain.zero_grad()
@@ -106,6 +116,7 @@ class BrainWasher:
                 loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer_retain.step()
+            '''
                 
             if self.USE_MOCK: 
                 print(f'epoch {ep}:')

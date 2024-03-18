@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import visdom
 from path import Path
-import torch_xla.core.xla_model as xm
+#import torch_xla.core.xla_model as xm
 
 
 class ModelSaver():
@@ -33,7 +33,7 @@ class ModelSaver():
     def save_if_best(self, accuracy, state):
         if accuracy > self.current_acc:
             self.__set_accuracy(accuracy)
-            xm.save(state, 'log/best_state.pth')
+            torch.save(state, 'log/best_state.pth')
 
 
 def create_if_not_exist(path):

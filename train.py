@@ -5,7 +5,7 @@ Created on Tue Feb 27 10:55:08 2024
 @author: TEJA
 """
 
-
+import signal,sys
 import datetime
 import time
 import os
@@ -17,7 +17,8 @@ import torch
 import torch.optim as optim
 from torch.nn.modules.distance import PairwiseDistance
 from torch.optim import lr_scheduler
-import torch_xla.core.xla_model as xm
+#import torch_xla.core.xla_model as xm
+#import torch_xla.debug.metrics as met
 #from pretrainedmodels import inceptionresnetv2
 
 
@@ -32,34 +33,39 @@ from write_csv_for_making_dataset import write_csv
 
 
 learning_rate=0.01
-step_size=50
+step_size=20
 num_epochs=50
-margin = 0 
-#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+margin = 0.5
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
-modelsaver = ModelSaver()
+#modelsaver = ModelSaver()
 
-train_root_dir="./datasets/faces_webface_112x112/MS1M_112x112"
-valid_root_dir=""
-train_csv_name= "./files/casia_details_final.csv"
-valid_csv_name= ""
-num_train_triplets= 10000
-num_valid_triplets= 10000
+
+
+
+train_root_dir="E:/programmer me/unlearning/datasets/faces_webface_112x112/MS1M_112x112"
+valid_root_dir="E:/programmer me/unlearning/datasets/aligned"
+train_csv_name= "files/casia_full.csv"
+valid_csv_name= "files/lfwd.csv"
+num_train_triplets= 4096
+num_valid_triplets= 4096
 batch_size=16
 num_workers=1
+
 num_classes=10572
 unfreeze=[]
 
-os.environ['PJRT_DEVICE']='TPU'
 
-device=xm.xla_device()
+#os.environ['PJRT_DEVICE']='TPU'
+
+#device=xm.xla_device()
 
 
 
 
 def main():
-    init_log_just_created("log/valid.csv")
-    init_log_just_created("log/train.csv")
+    #init_log_just_created("log/valid.csv")
+    #init_log_just_created("log/train.csv")
     
     valid = pd.read_csv('log/valid.csv')
     max_acc = valid['acc'].max()
@@ -82,22 +88,27 @@ def main():
     #print(f"Learning rate will decayed every {args.step_size}th epoch")
     model = InceptionResNetV2(num_classes)
     model.to(device)
+    print(device)
     triplet_loss = TripletLoss(margin).to(device)
 
     
 
-    optimizer = optim.Adam(
-        params=model.parameters(),
-        lr=learning_rate,
-        betas=(0.9, 0.999),
-        eps=1e-08,
-        amsgrad=False,
-        weight_decay=1e-5
-    )
+    
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,eps=1e-08,weight_decay=1e-5)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
+    def handle_interrupt(signal, frame):
+        print("Training interrupted. Saving model...")
+        torch.save(model.state_dict(), "models/interrupted_model.pt")
+        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
+        print(epoch)
+        sys.exit(0)
+
+    # Register the Ctrl+C signal handler
+    signal.signal(signal.SIGINT, handle_interrupt)
 
     
-
+    #try:
+     #model = torch.nn.DataParallel(model)
     for epoch in range(0, num_epochs):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, num_epochs))
@@ -106,39 +117,69 @@ def main():
         data_loaders, data_size = get_dataloader(train_root_dir, valid_root_dir,
                                                  train_csv_name, valid_csv_name,
                                                  num_train_triplets, num_valid_triplets,
-                                                 batch_size, num_workers)
-
+                                                 batch_size, num_workers,epoch)
+        print("data loaded")
+        print(f'  Execution time                 = {time.time() - time0}')
+        
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
+        
         print(f'  Execution time                 = {time.time() - time0}')
     print(80 * '=')
+    
+    '''
+    #except:
+        print("Training excepted. Saving model...")
+        torch.save(model.state_dict(), "models/interrupted_model_except.pt")
+        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
+    '''
+        
 
 
 def save_last_checkpoint(state):
-    xm.save(state, 'log/last_checkpoint.pth')
+    torch.save(state, "log/last_checkpoint.pth")
 
 def save_if_best(state, acc):
-    modelsaver.save_if_best(acc, state)
+    pass
+    #modelsaver.save_if_best(acc, state)
+
+def compute_l2_distance(x1, x2):
+  # Move tensors to TPU device
+  x1 = x1.to(device)
+  x2 = x2.to(device)
+
+  # Calculate squared Euclidean distance (L2 norm)
+  diff = x1 - x2
+  distances = torch.sum(diff * diff, dim=1)  # Sum squares along feature dimension
+  return distances
     
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
+     time0 = time.time()
      for phase in ['train', 'valid']:
     #for phase in ['train']:
+        
 
         labels, distances = [], []
         triplet_loss_sum = 0.0
 
         if phase == 'train':
-            scheduler.step()
-            if scheduler.last_epoch % scheduler.step_size == 0:
-                print("LR decayed to:", ', '.join(map(str, scheduler.get_lr())))
+            
             model.train()
         else:
             model.eval()
+        
+        print(phase)
 
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
+            if batch_idx % 1 == 0:  # Print every 100 batches
+                #xm.master_print(met.metrics_report())
+                print(f"Batch [{batch_idx}/{len(dataloaders[phase])}]")
 
             anc_img = batch_sample['anc_img'].to(device)
             pos_img = batch_sample['pos_img'].to(device)
             neg_img = batch_sample['neg_img'].to(device)
+
+            print("forward pass")
+            print(f'  Execution time                 = {time.time() - time0}')
 
             # pos_cls = batch_sample['pos_class'].to(device)
             # neg_cls = batch_sample['neg_class'].to(device)
@@ -147,41 +188,59 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
                 # anc_embed, pos_embed and neg_embed are encoding(embedding) of image
                 anc_embed, pos_embed, neg_embed = model(anc_img), model(pos_img), model(neg_img)
+                
+                print("gradient calc")
+                print(f'  Execution time                 = {time.time() - time0}')
+                
 
                 # choose the semi hard negatives only for "training"
-                pos_dist = l2_dist.forward(anc_embed, pos_embed)
-                neg_dist = l2_dist.forward(anc_embed, neg_embed)
+                pos_dist = compute_l2_distance(anc_embed, pos_embed)
+                neg_dist = compute_l2_distance(anc_embed, neg_embed)
 
+                neg_dist = neg_dist.to(device)
+                pos_dist = pos_dist.to(device)
+
+                margin = 0.1
+                # Calculate condition and move result to host CPU as NumPy array
+                margin = torch.tensor(margin)  # Assuming margin is a constant value
                 all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
+                all = torch.tensor(all)
+                #all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
                 if phase == 'train':
-                    hard_triplets = np.where(all == 1)
+                    hard_triplets = torch.where(all == 1)
                     if len(hard_triplets[0]) == 0:
                         continue
                 else:
-                    hard_triplets = np.where(all >= 0)
+                    hard_triplets = torch.where(all >= 0)
 
-                anc_hard_embed = anc_embed[hard_triplets]
-                pos_hard_embed = pos_embed[hard_triplets]
-                neg_hard_embed = neg_embed[hard_triplets]
+                anc_embed = anc_embed[hard_triplets]
+                pos_embed = pos_embed[hard_triplets]
+                neg_embed = neg_embed[hard_triplets]
 
-                anc_hard_img = anc_img[hard_triplets]
-                pos_hard_img = pos_img[hard_triplets]
-                neg_hard_img = neg_img[hard_triplets]
+                anc_img = anc_img[hard_triplets]
+                model.forward_classifier(anc_img.to(device))
+                anc_img = pos_img[hard_triplets]
+                model.forward_classifier(anc_img.to(device))
+                anc_img = neg_img[hard_triplets]
+                model.forward_classifier(anc_img.to(device))
 
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]
-
-                model.module.forward_classifier(anc_hard_img)
-                model.module.forward_classifier(pos_hard_img)
-                model.module.forward_classifier(neg_hard_img)
-
-                triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
+                
+                print("gradients")
+                print(f'  Execution time                 = {time.time() - time0}')
+                print("loss calc")
+                triplet_loss = triploss.forward(anc_embed, pos_embed, neg_embed)
+                print(f'  Execution time                 = {time.time() - time0}')
 
                 if phase == 'train':
                     optimizer.zero_grad()
                     triplet_loss.backward()
-                    #optimizer.step()
-                    xm.optimizer_step(optimizer)
+                    optimizer.step()
+                    #xm.optimizer_step(optimizer)
+                    print("backprop")
+                print(f'  Execution time                 = {time.time() - time0}')
+            
                 distances.append(pos_dist.data.cpu().numpy())
                 labels.append(np.ones(pos_dist.size(0)))
 
@@ -189,7 +248,10 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 labels.append(np.zeros(neg_dist.size(0)))
 
                 triplet_loss_sum += triplet_loss.item()
-
+        
+        scheduler.step()
+        if scheduler.last_epoch % scheduler.step_size == 0:
+            print("LR decayed to:", ', '.join(map(str, scheduler.get_lr())))
         avg_triplet_loss = triplet_loss_sum / data_size[phase]
         labels = np.array([sublabel for label in labels for sublabel in label])
         distances = np.array([subdist for dist in distances for subdist in dist])
@@ -198,10 +260,10 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print('  {} set - Triplet Loss       = {:.8f}'.format(phase, avg_triplet_loss))
         print('  {} set - Accuracy           = {:.8f}'.format(phase, np.mean(accuracy)))
 
-        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        time_ = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         lr = '_'.join(map(str, scheduler.get_lr()))
         layers = '+'.join(unfreeze.split(','))
-        write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss, layers, batch_size, lr])
+        write_csv(f'log/{phase}.csv', [time_, epoch, np.mean(accuracy), avg_triplet_loss, layers, batch_size, lr])
 
         if phase == 'valid':
             save_last_checkpoint({'epoch': epoch,
