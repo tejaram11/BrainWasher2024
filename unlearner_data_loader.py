@@ -51,12 +51,13 @@ def get_dataset(batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
                                  std=[0.229, 0.224, 0.225]),
         ])
         
-        dataset_dir='./datasets/faces_webface_112x112/MS1M_112x112'
-        valid_dataset_dir='./datasets/alinged'
+        kaggle_dir='/kaggle/working/BrainWasher2024/'
+        dataset_dir='/kaggle/input/casia-webface/MS1M_112x112'
+        valid_dataset_dir='/kaggle/input/cplfw'
         
-        retain_csv='.files/casia_retain.csv'
-        forget_csv='files/casia_forget.csv'
-        valid_csv='files/lfwd.csv'
+        retain_csv=kaggle_dir+'.files/casia_retain.csv'
+        forget_csv=kaggle_dir+'files/casia_forget.csv'
+        valid_csv=kaggle_dir+'files/lfwd.csv'
         
 
         # create dataset
