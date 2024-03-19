@@ -174,7 +174,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print(phase)
 
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
-            if batch_idx % 10 == 0:  # Print every 100 batches
+            if batch_idx % 100 == 0:  # Print every 100 batches
                 #xm.master_print(met.metrics_report())
                 print(f"Batch [{batch_idx}/{len(dataloaders[phase])}]")
 
