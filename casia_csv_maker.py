@@ -29,12 +29,38 @@ for class_folder in os.listdir(root_dir):
                 serial_number += 1
                 
 # Write CSV data to file
-with open(csv_file, 'w', newline='') as file:
+with open(csv_file, 'w', newline='',encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(['id', 'name', 'class','ext'])
     for row in csv_data:
         writer.writerow([row[0],row[1], row[2],row[3]])
 
+#%%
+import chardet
+
+def detect_encoding(file_path):
+  """
+  Detects the encoding of a text file using chardet library.
+
+  Args:
+      file_path (str): Path to the text file.
+
+  Returns:
+      dict: Dictionary containing the detected encoding and confidence level.
+  """
+  with open(file_path, 'rb') as f:
+    rawdata = f.read()
+
+  return chardet.detect(rawdata)
+
+# Example usage
+file_path = "files/lfwd.csv"  # Replace with your file path
+encoding_info = detect_encoding(file_path)
+
+if encoding_info:
+  print(f"Detected encoding: {encoding_info['encoding']} (confidence: {encoding_info['confidence']:.2f})")
+else:
+  print("Unable to detect encoding with certainty.")
 
 
 #%%
