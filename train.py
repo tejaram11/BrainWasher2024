@@ -263,7 +263,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         time_ = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         lr = '_'.join(map(str, scheduler.get_lr()))
-        layers = '+'.join(unfreeze.split(','))
+        layers = 'all'
         write_csv(f'log/{phase}.csv', [time_, epoch, np.mean(accuracy), avg_triplet_loss, layers, batch_size, lr])
 
         if phase == 'valid':
