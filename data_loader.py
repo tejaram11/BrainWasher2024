@@ -40,6 +40,8 @@ class TripletFaceDataset(Dataset):
         self.epoch = epoch
         self.transform = transform
         self.phase=phase
+        if phase=='valid':
+            self.class_to_int_map = {cls: i for i, cls in enumerate(self.df['class'].unique())}
 
         # Modified here to bypass having to use pandas.dataframe.loc for retrieving the class name
         #  and using dataframe.iloc for creating the face_classes dictionary
@@ -161,7 +163,11 @@ class TripletFaceDataset(Dataset):
         anc_img = io.imread(anc_img)
         pos_img = io.imread(pos_img)
         neg_img = io.imread(neg_img)
-
+        
+        if self.phase=='valid':
+            pos_class = self.class_to_int_map[pos_class]
+            neg_class = self.class_to_int_map[neg_class]
+            
         pos_class = torch.from_numpy(np.array([pos_class]).astype('long'))
         neg_class = torch.from_numpy(np.array([neg_class]).astype('long'))
 
