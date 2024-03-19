@@ -93,7 +93,7 @@ def main():
     signal.signal(signal.SIGINT, handle_interrupt)
     
     if load_best or load_last:
-        checkpoint = './log/best_state.pth' if load_best else './log/last_checkpoint.pth'
+        checkpoint = '/log/best_state.pth' if load_best else '/log/last_checkpoint.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
         modelsaver.current_acc = max_acc
