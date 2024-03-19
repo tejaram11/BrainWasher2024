@@ -29,7 +29,7 @@ for class_folder in os.listdir(root_dir):
                 serial_number += 1
                 
 # Write CSV data to file
-with open(csv_file, 'w', newline='',encoding='utf-8') as file:
+with open(csv_file, 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['id', 'name', 'class','ext'])
     for row in csv_data:
