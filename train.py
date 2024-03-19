@@ -30,7 +30,7 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.01
+learning_rate=0.05
 step_size=20
 num_epochs=50
 
@@ -50,9 +50,9 @@ num_train_triplets= 8192
 num_valid_triplets= 512
 batch_size=16
 num_workers=1
-load_best=False
-load_last=False
-continue_step=False
+load_best=True
+load_last=True
+continue_step=True
 
 num_classes=10572
 unfreeze=[]
