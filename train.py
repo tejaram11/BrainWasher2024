@@ -268,13 +268,13 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         if phase == 'valid':
             save_last_checkpoint({'epoch': epoch,
-                                  'state_dict': model.module.state_dict(),
+                                  'state_dict': model.state_dict(),
                                   'optimizer_state': optimizer.state_dict(),
                                   'accuracy': np.mean(accuracy),
                                   'loss': avg_triplet_loss
                                   })
             save_if_best({'epoch': epoch,
-                          'state_dict': model.module.state_dict(),
+                          'state_dict': model.state_dict(),
                           'optimizer_state': optimizer.state_dict(),
                           'accuracy': np.mean(accuracy),
                           'loss': avg_triplet_loss
