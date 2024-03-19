@@ -118,8 +118,8 @@ def main():
                                                  train_csv_name, valid_csv_name,
                                                  num_train_triplets, num_valid_triplets,
                                                  batch_size, num_workers,epoch)
-        print("data loaded")
-        print(f'  Execution time                 = {time.time() - time0}')
+        #print("data loaded")
+        #print(f'  Execution time                 = {time.time() - time0}')
         
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
         
@@ -170,7 +170,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print(phase)
 
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
-            if batch_idx % 1 == 0:  # Print every 100 batches
+            if batch_idx % 10 == 0:  # Print every 100 batches
                 #xm.master_print(met.metrics_report())
                 print(f"Batch [{batch_idx}/{len(dataloaders[phase])}]")
 
@@ -178,8 +178,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
             pos_img = batch_sample['pos_img'].to(device)
             neg_img = batch_sample['neg_img'].to(device)
 
-            print("forward pass")
-            print(f'  Execution time                 = {time.time() - time0}')
+            #print("forward pass")
+            #print(f'  Execution time                 = {time.time() - time0}')
 
             # pos_cls = batch_sample['pos_class'].to(device)
             # neg_cls = batch_sample['neg_class'].to(device)
@@ -189,8 +189,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 # anc_embed, pos_embed and neg_embed are encoding(embedding) of image
                 anc_embed, pos_embed, neg_embed = model(anc_img), model(pos_img), model(neg_img)
                 
-                print("gradient calc")
-                print(f'  Execution time                 = {time.time() - time0}')
+                #print("gradient calc")
+                #print(f'  Execution time                 = {time.time() - time0}')
                 
 
                 # choose the semi hard negatives only for "training"
@@ -227,19 +227,19 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]
                 
-                print("gradients")
-                print(f'  Execution time                 = {time.time() - time0}')
-                print("loss calc")
+                #print("gradients")
+                #print(f'  Execution time                 = {time.time() - time0}')
+                #print("loss calc")
                 triplet_loss = triploss.forward(anc_embed, pos_embed, neg_embed)
-                print(f'  Execution time                 = {time.time() - time0}')
+                #print(f'  Execution time                 = {time.time() - time0}')
 
                 if phase == 'train':
                     optimizer.zero_grad()
                     triplet_loss.backward()
                     optimizer.step()
                     #xm.optimizer_step(optimizer)
-                    print("backprop")
-                print(f'  Execution time                 = {time.time() - time0}')
+                    #print("backprop")
+                #print(f'  Execution time                 = {time.time() - time0}')
             
                 distances.append(pos_dist.data.cpu().numpy())
                 labels.append(np.ones(pos_dist.size(0)))
