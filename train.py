@@ -34,7 +34,7 @@ learning_rate=0.05
 step_size=20
 num_epochs=50
 
-margin = 0.5
+margin = 0.4
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
@@ -50,7 +50,7 @@ num_train_triplets= 8192
 num_valid_triplets= 512
 batch_size=16
 num_workers=1
-load_best=True
+load_best=False
 load_last=True
 continue_step=True
 
