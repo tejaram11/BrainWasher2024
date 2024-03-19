@@ -43,7 +43,7 @@ modelsaver = ModelSaver()
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
 train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
-valid_root_dir="/kaggle/input/cplfw1/aligned"
+valid_root_dir="/kaggle/input/cplfw2/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 8192
