@@ -49,7 +49,7 @@ train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 4096
 num_valid_triplets= 4096
-batch_size=32
+batch_size=16
 num_workers=1
 
 num_classes=10572
