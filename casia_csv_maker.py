@@ -9,10 +9,10 @@ import os
 import csv
 
 # Define directory containing subdirectories
-root_dir = "E:/programmer me/unlearning/datasets/cplfw/images"
+root_dir = "E:/programmer me/unlearning/datasets/aligned"
 
 # Define output CSV file
-csv_file = "face_identities_cplfw.csv"
+csv_file = "lfwd.csv"
 
 csv_data = []
 
