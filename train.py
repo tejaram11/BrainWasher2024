@@ -155,7 +155,7 @@ def compute_l2_distance(x1, x2):
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
      time0 = time.time()
      #for phase in ['train', 'valid']:
-    for phase in ['valid']:
+     for phase in ['valid']:
         
 
         labels, distances = [], []
