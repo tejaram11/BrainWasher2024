@@ -8,9 +8,8 @@ Created on Tue Feb 27 10:55:08 2024
 import signal,sys
 import datetime
 import time
-import os
 
-from tqdm import tqdm
+
 import pandas as pd
 import numpy as np
 import torch
@@ -34,11 +33,12 @@ from write_csv_for_making_dataset import write_csv
 
 learning_rate=0.01
 step_size=20
-num_epochs=40
+num_epochs=50
+start_epoch=0
 margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
-#modelsaver = ModelSaver()
+modelsaver = ModelSaver()
 
 
 
@@ -47,10 +47,13 @@ train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
-num_train_triplets= 4096
+num_train_triplets= 512
 num_valid_triplets= 512
 batch_size=16
 num_workers=1
+load_best=False
+load_last=False
+continue_step=False
 
 num_classes=10572
 unfreeze=[]
@@ -64,36 +67,17 @@ unfreeze=[]
 
 
 def main():
-    #init_log_just_created("log/valid.csv")
-    #init_log_just_created("log/train.csv")
+    init_log_just_created("log/valid.csv")
+    init_log_just_created("log/train.csv")
     
     valid = pd.read_csv('log/valid.csv')
     max_acc = valid['acc'].max()
-    
 
-    #pretrain = args.pretrain
-    #fc_only = args.fc_only
-    #except_fc = args.except_fc
-    #train_all = args.train_all
-    #unfreeze = args.unfreeze.split(',')
-    #freeze = args.freeze.split(',')
-    #start_epoch = 0
-    #print(f"Transfer learning: {pretrain}")
-    #print("Train fc only:", fc_only)
-    #print("Train except fc:", except_fc)
-    #print("Train all layers:", train_all)
-    #print("Unfreeze only:", ', '.join(unfreeze))
-    #print("Freeze only:", ', '.join(freeze))
-    #print(f"Max acc: {max_acc:.4f}")
-    #print(f"Learning rate will decayed every {args.step_size}th epoch")
+
     model = InceptionResNetV2(num_classes)
     model.to(device)
     print(device)
-    triplet_loss = TripletLoss(margin).to(device)
-
-    
-
-    
+    triplet_loss = TripletLoss(margin).to(device)    
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,eps=1e-08,weight_decay=1e-5)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
@@ -105,11 +89,30 @@ def main():
 
     # Register the Ctrl+C signal handler
     signal.signal(signal.SIGINT, handle_interrupt)
+    
+    if load_best or load_last:
+        checkpoint = './log/best_state.pth' if load_best else './log/last_checkpoint.pth'
+        print('loading', checkpoint)
+        checkpoint = torch.load(checkpoint)
+        modelsaver.current_acc = max_acc
+        start_epoch = checkpoint['epoch'] + 1
+        model.load_state_dict(checkpoint['state_dict'])
+        print("Stepping scheduler")
+        try:
+            optimizer.load_state_dict(checkpoint['optimizer_state'])
+        except ValueError as e:
+            print("Can't load last optimizer")
+            print(e)
+        if continue_step:
+            scheduler.step(checkpoint['epoch'])
+        print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
+              f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
+              f"Loaded checkpoint loss: {checkpoint['loss']}")
 
     
     #try:
      #model = torch.nn.DataParallel(model)
-    for epoch in range(0, num_epochs):
+    for epoch in range(start_epoch, num_epochs):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, num_epochs))
 
@@ -139,8 +142,7 @@ def save_last_checkpoint(state):
     torch.save(state, "log/last_checkpoint.pth")
 
 def save_if_best(state, acc):
-    pass
-    #modelsaver.save_if_best(acc, state)
+    modelsaver.save_if_best(acc, state)
 
 def compute_l2_distance(x1, x2):
   # Move tensors to TPU device
@@ -153,9 +155,9 @@ def compute_l2_distance(x1, x2):
   return distances
     
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
-     time0 = time.time()
-     #for phase in ['train', 'valid']:
-     for phase in ['valid']:
+     #time0 = time.time()
+     for phase in ['train', 'valid']:
+     #for phase in ['valid']:
         
 
         labels, distances = [], []
@@ -200,7 +202,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
 
-                margin = 0.1
+                margin = 0.5
                 # Calculate condition and move result to host CPU as NumPy array
                 margin = torch.tensor(margin)  # Assuming margin is a constant value
                 all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
