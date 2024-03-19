@@ -31,42 +31,13 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.01
-step_size=20
-num_epochs=50
-start_epoch=0
-margin = 0.5
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-l2_dist = PairwiseDistance(2)
-modelsaver = ModelSaver()
-
-
-
-kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
-valid_root_dir="/kaggle/input/cplfw/aligned"
-train_csv_name= "files/casia_full.csv"
-valid_csv_name= "files/lfwd.csv"
-num_train_triplets= 512
-num_valid_triplets= 512
-batch_size=16
-num_workers=1
-load_best=False
-load_last=False
-continue_step=False
-
-num_classes=10572
-unfreeze=[]
-
-
-#os.environ['PJRT_DEVICE']='TPU'
-
-#device=xm.xla_device()
 
 
 
 
 def main():
+    
+    
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
     
@@ -286,4 +257,37 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
 
 if __name__ == '__main__':
+    
+    learning_rate=0.01
+    step_size=20
+    num_epochs=50
+    start_epoch=0
+    margin = 0.5
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    l2_dist = PairwiseDistance(2)
+    modelsaver = ModelSaver()
+
+
+
+    kaggle_dir= "/kaggle/working/BrainWasher2024/"
+    train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
+    valid_root_dir="/kaggle/input/cplfw/aligned"
+    train_csv_name= "files/casia_full.csv"
+    valid_csv_name= "files/lfwd.csv"
+    num_train_triplets= 512
+    num_valid_triplets= 512
+    batch_size=16
+    num_workers=1
+    load_best=False
+    load_last=False
+    continue_step=False
+
+    num_classes=10572
+    unfreeze=[]
+
+
+    #os.environ['PJRT_DEVICE']='TPU'
+
+    #device=xm.xla_device()
+
     main()
