@@ -34,7 +34,7 @@ from write_csv_for_making_dataset import write_csv
 
 learning_rate=0.01
 step_size=20
-num_epochs=50
+num_epochs=40
 margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
@@ -48,7 +48,7 @@ valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 4096
-num_valid_triplets= 4096
+num_valid_triplets= 512
 batch_size=16
 num_workers=1
 
@@ -154,8 +154,8 @@ def compute_l2_distance(x1, x2):
     
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
      time0 = time.time()
-     for phase in ['train', 'valid']:
-    #for phase in ['train']:
+     #for phase in ['train', 'valid']:
+    for phase in ['valid']:
         
 
         labels, distances = [], []
