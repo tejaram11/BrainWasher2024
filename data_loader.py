@@ -134,6 +134,10 @@ class TripletFaceDataset(Dataset):
                 )
 
         print("Saving training triplets list in 'datasets/generated_triplets' directory ...")
+        trip_path='files/triplets/{}/epoch_{}_training_triplets_{}_identities_{}_batch_{}.npy'.format(
+                self.phase,self.epoch, self.num_triplets, self.num_human_identities_per_batch, self.triplet_batch_size)
+        if not os.path.exists(trip_path):
+            os.makedirs(trip_path)
         np.save('files/triplets/{}/epoch_{}_training_triplets_{}_identities_{}_batch_{}.npy'.format(
                 self.phase,self.epoch, self.num_triplets, self.num_human_identities_per_batch, self.triplet_batch_size
             ),
