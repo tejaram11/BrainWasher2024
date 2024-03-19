@@ -73,11 +73,14 @@ def calculate_val(thresholds, distances, labels, far_target=1e-3, nrof_folds=10)
         far_train = np.zeros(nrof_thresholds)
         for threshold_idx, threshold in enumerate(thresholds):
             _, far_train[threshold_idx] = calculate_val_far(threshold, distances[train_set], labels[train_set])
-        if np.max(far_train) >= far_target:
-            f = interpolate.interp1d(far_train, thresholds, kind='slinear')
-            threshold = f(far_target)
-        else:
-            threshold = 0.0
+        
+        # Remove duplicate values in far_train to avoid interpolation issues
+        far_train_unique, unique_indices = np.unique(far_train, return_index=True)
+        thresholds_unique = thresholds[unique_indices]
+
+        # Interpolate using linear interpolation
+        f = interpolate.interp1d(far_train_unique, thresholds_unique, kind='linear')
+        threshold = f(far_target)
 
         val[fold_idx], far[fold_idx] = calculate_val_far(threshold, distances[test_set], labels[test_set])
 

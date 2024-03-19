@@ -252,6 +252,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         scheduler.step()
         if scheduler.last_epoch % scheduler.step_size == 0:
             print("LR decayed to:", ', '.join(map(str, scheduler.get_lr())))
+        
         avg_triplet_loss = triplet_loss_sum / data_size[phase]
         labels = np.array([sublabel for label in labels for sublabel in label])
         distances = np.array([subdist for dist in distances for subdist in dist])
