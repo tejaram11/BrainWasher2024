@@ -50,7 +50,7 @@ num_train_triplets= 8192
 num_valid_triplets= 512
 batch_size=16
 num_workers=1
-load_best=True
+load_best=False
 load_last=True
 continue_step=True
 
