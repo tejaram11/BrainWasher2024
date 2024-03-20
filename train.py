@@ -31,10 +31,10 @@ from write_csv_for_making_dataset import write_csv
 
 
 learning_rate=0.05
-step_size=20
-num_epochs=100
+step_size=25
+num_epochs=150
 
-margin = 0.4
+margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
