@@ -80,7 +80,7 @@ def main():
     model.to(device)
     print(device)
     triplet_loss = TripletLoss(margin).to(device)    
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,eps=1e-08,weight_decay=1e-5)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,eps=1e-08)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
         print("Training interrupted. Saving model...")
@@ -100,11 +100,13 @@ def main():
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
+        '''
         try:
             optimizer.load_state_dict(checkpoint['optimizer_state'])
         except ValueError as e:
             print("Can't load last optimizer")
             print(e)
+        '''
         if continue_step:
             scheduler.step(checkpoint['epoch'])
         print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
