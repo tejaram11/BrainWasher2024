@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from torch.utils.data import Subset
 from PIL import Image
+from skimage import io
 import torch
 import numpy as np
 
@@ -32,7 +33,7 @@ class casia_dataset(Dataset):
         img_name = self.data.loc[idx, 'name']
         label = self.data.loc[idx, 'class']
         img_path=os.path.join(self.root_dir,str(label),str(img_name)+'.jpg')
-        image = Image.open(img_path).convert('RGB')  # Load image as RGB
+        image = io.imread(img_path)  # Load image as RGB
         label = self.data.loc[idx, 'class']
         label = self.class_to_int_map[self.label]
         label= torch.from_numpy(np.array([self.label]).astype('long'))

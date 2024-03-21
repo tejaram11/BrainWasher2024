@@ -10,9 +10,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from train import train_valid
+from train import train_valid, get_dataloader
 from torch.optim.lr_scheduler import CosineAnnealingLR,StepLR
 from loss import TripletLoss
+
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu' 
 print(DEVICE)
@@ -105,8 +106,14 @@ class BrainWasher:
                 optimizer_forget.step()
                 scheduler.step()
              ##Retain Round
-            triplet_loader = { x: torch.utils.data.DataLoader(x.dataset, batch_size=16, shuffle=False, num_workers=1) for x in [retain_loader, validation_loader]}
-            triplet_data_size = {x: len(x.dataset) for x in [retain_loader, validation_loader]}
+            #triplet_loader = { x: torch.utils.data.DataLoader(x.dataset, batch_size=16, shuffle=False, num_workers=1) for x in [retain_loader, validation_loader]}
+            #triplet_data_size = {x: len(x.dataset) for x in [retain_loader, validation_loader]}
+            triplet_loader, triplet_data_size = get_dataloader("/kaggle/input/casia-webface/casia-webface",
+                                                     "/kaggle/input/cplfw/aligned",
+                                                     "files/casia_retain_set.csv",
+                                                     "files/lfwd.csv",
+                                                     8192, 512,
+                                                     16,1,ep)
             train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,triplet_data_size)
                 
             '''
