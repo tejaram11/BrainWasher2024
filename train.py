@@ -34,7 +34,7 @@ learning_rate=0.05
 step_size=25
 num_epochs=100
 
-margin = 0.2
+margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
@@ -44,7 +44,7 @@ torch.cuda.empty_cache()
 
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/casia-webface"
+train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
@@ -53,7 +53,7 @@ num_valid_triplets= 512
 batch_size=16
 num_workers=1
 load_best=False
-load_last=False
+load_last=True
 continue_step=False
 
 num_classes=10572
@@ -208,7 +208,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
 
-                margin = 0.2
+                margin = 0.5
                 # Calculate condition and move result to host CPU as NumPy array
                 margin = torch.tensor(margin)  # Assuming margin is a constant value
                 all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
