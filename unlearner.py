@@ -11,14 +11,14 @@ from torch.utils.data import DataLoader, Dataset
 from BrainWasher_algorithm import BrainWasher
 from unlearner_data_loader import get_dataset
 from utils_inceptionresnetv2 import InceptionResNetV2
-from facenet_pytorch import InceptionResnetV1
+#from facenet_pytorch import InceptionResnetV1
 
 
 trained_model_path='/kaggle/input/facenet-models/best_state_87.pth'
         
 
 BrainWasher_Inception=BrainWasher(USE_MOCK=True)
-model=InceptionResnetV1(pretrained=None)
+model = InceptionResNetV2(10572)
 
 model.load_state_dict(trained_model_path['state_dict'])
 
