@@ -38,6 +38,7 @@ margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
+torch.cuda.empty_cache()
 
 
 
