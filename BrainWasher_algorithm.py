@@ -110,7 +110,9 @@ class BrainWasher:
         for ep in range(epochs): ##Second Stage
             time0=time.time()
             net.train()
-            for sample_forget, sample_retain in zip(forget_loader, retain_ld4fgt):##Forget Round
+            for sample_id,(sample_forget, sample_retain) in enumerate(zip(forget_loader, retain_ld4fgt)):##Forget Round
+                if sample_id%10==0:
+                    print(sample_id)
                 t = 1.15 ##temperature coefficient
                 inputs_forget,inputs_retain = sample_forget["image"],sample_retain['image']
                 inputs_forget, inputs_retain = inputs_forget.to(DEVICE), inputs_retain.to(DEVICE)
@@ -123,7 +125,7 @@ class BrainWasher:
              ##Retain Round
             #triplet_loader = { x: torch.utils.data.DataLoader(x.dataset, batch_size=16, shuffle=False, num_workers=1) for x in [retain_loader, validation_loader]}
             #triplet_data_size = {x: len(x.dataset) for x in [retain_loader, validation_loader]}
-            triplet_loader, triplet_data_size = get_dataloader("/kaggle/input/casia-webface/casia-webface",
+            triplet_loader, triplet_data_size = get_dataloader("/kaggle/input/casia-webface/MS1M_112x112",
                                                      "/kaggle/input/cplfw/aligned",
                                                      "files/casia_retain_set.csv",
                                                      "files/lfwd.csv",
