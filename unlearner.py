@@ -17,10 +17,10 @@ from facenet_pytorch import InceptionResnetV1
 trained_model_path='/kaggle/input/models/20180408-102900-casia-webface.pt'
         
 
-BrainWasher_Inception=BrainWasher()
+BrainWasher_Inception=BrainWasher(USE_MOCK=True)
 model=InceptionResnetV1(pretrained=None)
 
-model.load_state_dict(torch.load(trained_model_path))
+model.load_state_dict(trained_model_path['state_dict'])
 
 retain_loader,forget_loader,validation_loader= get_dataset(64)
 model_forget=BrainWasher_Inception.unlearning(model, retain_loader, forget_loader, validation_loader)

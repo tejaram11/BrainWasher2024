@@ -32,7 +32,7 @@ from write_csv_for_making_dataset import write_csv
 
 learning_rate=0.05
 step_size=25
-num_epochs=150
+num_epochs=100
 
 margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -42,16 +42,16 @@ modelsaver = ModelSaver()
 
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
-valid_root_dir="/kaggle/input/cplfw2/aligned"
+train_root_dir="/kaggle/input/casia-webface/casia-webface"
+valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 8192
 num_valid_triplets= 512
-batch_size=16
+batch_size=32
 num_workers=1
 load_best=False
-load_last=True
+load_last=False
 continue_step=False
 
 num_classes=10572

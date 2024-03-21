@@ -57,7 +57,7 @@ class BrainWasher:
         """Simple unlearning by finetuning."""
         print('-----------------------------------')
         epochs = 8
-        retain_bs = 32
+        retain_bs = 16
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.SGD(net.parameters(), lr=0.005,
                               momentum=0.9, weight_decay=0)
