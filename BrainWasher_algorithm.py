@@ -70,6 +70,7 @@ class BrainWasher:
         scheduler = CosineAnnealingLR(optimizer_forget, T_max=total_step, eta_min=1e-6)
         scheduler_finetune= StepLR(optimizer_retain,step_size=20, gamma=0.1)
         triplet_loss=TripletLoss(0.5).to(DEVICE)
+        net.to(DEVICE)
         if self.USE_MOCK: ##Use some Local Metric as reference
             net.eval()
             print('Forget')
