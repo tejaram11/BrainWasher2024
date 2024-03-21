@@ -23,7 +23,7 @@ class casia_dataset(Dataset):
         self.root_dir = root_dir
         self.transform = transform
         if phase=='valid':
-            self.class_to_int_map = {cls: i for i, cls in enumerate(self.df['class'].unique())}
+            self.class_to_int_map = {cls: i for i, cls in enumerate(self.data['class'].unique())}
 
     def __len__(self):
         return len(self.data)
