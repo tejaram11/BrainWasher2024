@@ -86,8 +86,9 @@ class BrainWasher:
             self.evaluation(net, validation_loader, criterion)
         net.train()
         time0 = time.time()
+        print("First stage")
         for sample in forget_loader: ##First Stage 
-            print("First stage")
+            
             inputs = sample["image"]
             inputs = inputs.to(DEVICE)
             optimizer.zero_grad()
@@ -96,7 +97,7 @@ class BrainWasher:
             loss = self.kl_loss_sym(outputs, uniform_label) ##optimize the distance between logits and pseudo labels
             loss.backward()
             optimizer.step()
-            print(f'  Execution time                 = {time.time() - time0}')
+        print(f'  Execution time                 = {time.time() - time0}')
         if self.USE_MOCK:
             print('Forget')
             self.evaluation(net,forget_loader,criterion)
