@@ -215,7 +215,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
 
-                margin = 0.7
+                margin = 0.5
                 # Calculate condition and move result to host CPU as NumPy array
                 margin = torch.tensor(margin)  # Assuming margin is a constant value
                 all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
