@@ -51,8 +51,7 @@ class BrainWasher:
             net,
             retain_loader,
             forget_loader,
-            validation_loader,
-            triplet_loader,
+            validation_loader
             ):
         """Simple unlearning by finetuning."""
         print('-----------------------------------')
@@ -105,8 +104,10 @@ class BrainWasher:
                 loss.backward()
                 optimizer_forget.step()
                 scheduler.step()
-            for sample in retain_ld: ##Retain Round
-                train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,1)
+             ##Retain Round
+            triplet_loader = { x: torch.utils.data.DataLoader(x.dataset, batch_size=16, shuffle=False, num_workers=1) for x in [retain_loader, validation_loader]}
+            triplet_data_size = {x: len(x.dataset) for x in [retain_loader, validation_loader]}
+            train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,triplet_data_size)
                 
             '''
                 inputs, labels = sample["image"],sample["age_group"]
