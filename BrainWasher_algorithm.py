@@ -34,7 +34,7 @@ class BrainWasher:
             _pred = net.forward_classifier(images)
             print(_pred.shape)
             print(labels.shape)
-            
+            _pred=torch.argmax(_pred,dim=1)
             print(f'pred:{_pred}')
             print(f'label:{labels}')
             total_samp+=len(labels)
@@ -71,7 +71,7 @@ class BrainWasher:
         optimizer_forget = optim.SGD(net.parameters(), lr=3e-4, momentum=0.9, weight_decay=0)
         total_step = int(len(forget_loader)*epochs)
         retain_ld = DataLoader(retain_loader.dataset, batch_size=retain_bs, shuffle=True)
-        retain_ld4fgt = DataLoader(retain_loader.dataset, batch_size=32, shuffle=True)
+        retain_ld4fgt = DataLoader(retain_loader.dataset, batch_size=16, shuffle=True)
         scheduler = CosineAnnealingLR(optimizer_forget, T_max=total_step, eta_min=1e-6)
         scheduler_finetune= StepLR(optimizer_retain,step_size=20, gamma=0.1)
         triplet_loss=TripletLoss(0.5).to(DEVICE)
