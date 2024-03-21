@@ -104,8 +104,10 @@ class BrainWasher:
             self.evaluation(net, validation_loader,criterion)
             print(f'epoch={epochs} and retain batch_sz={retain_bs}') 
         net.train()
-        
-        for ep in range(epochs): ##Second Stage 
+        print(f'  Execution time = {time.time() - time0}')
+        print("second stage")
+        for ep in range(epochs): ##Second Stage
+            time0=time.time()
             net.train()
             for sample_forget, sample_retain in zip(forget_loader, retain_ld4fgt):##Forget Round
                 t = 1.15 ##temperature coefficient
@@ -137,7 +139,8 @@ class BrainWasher:
                 loss.backward()
                 optimizer_retain.step()
             '''
-                
+            print(f'epoch: {ep}')
+            print(f'  Execution time = {time.time() - time0}')    
             if self.USE_MOCK: 
                 print(f'epoch {ep}:')
                 print('Retain')
