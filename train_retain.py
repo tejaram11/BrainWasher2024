@@ -183,7 +183,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
             model.eval()
         
         print(phase)
-
+        torch.cuda.empty_cache()
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
             if batch_idx % 100 == 0:  # Print every 100 batches
                 #xm.master_print(met.metrics_report())
