@@ -38,7 +38,7 @@ class casia_dataset(Dataset):
         #label = self.data.loc[idx, 'class']
         if self.phase=='valid':
             label = self.class_to_int_map[label]
-        label= torch.from_numpy(np.array([label]).astype('str'))
+        label= torch.from_numpy(np.array([label]).astype('float32'))
 
         if self.transform:
             image = self.transform(image)  # Apply transformations if any
