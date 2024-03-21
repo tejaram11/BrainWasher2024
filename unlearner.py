@@ -22,7 +22,7 @@ model = InceptionResNetV2(10572)
 
 model.load_state_dict(trained_model['state_dict'])
 
-retain_loader,forget_loader,validation_loader= get_dataset(64)
+retain_loader,forget_loader,validation_loader= get_dataset(32)
 model_forget=BrainWasher_Inception.unlearning(model, retain_loader, forget_loader, validation_loader)
 forget_state=model_forget.state_dict()
 torch.save(forget_state,'/kaggle/working/models/unlearned_model.pth')
