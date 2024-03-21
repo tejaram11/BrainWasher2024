@@ -23,7 +23,8 @@ class casia_dataset(Dataset):
         self.data = pd.read_csv(csv_file,dtype={'id': object, 'name': object, 'class': object})
         self.root_dir = root_dir
         self.transform = transform
-        if phase=='valid':
+        self.phase=phase
+        if self.phase=='valid':
             self.class_to_int_map = {cls: i for i, cls in enumerate(self.data['class'].unique())}
 
     def __len__(self):
@@ -34,9 +35,10 @@ class casia_dataset(Dataset):
         label = self.data.loc[idx, 'class']
         img_path=os.path.join(self.root_dir,str(label),str(img_name)+'.jpg')
         image = io.imread(img_path)  # Load image as RGB
-        label = self.data.loc[idx, 'class']
-        label = self.class_to_int_map[self.label]
-        label= torch.from_numpy(np.array([self.label]).astype('long'))
+        #label = self.data.loc[idx, 'class']
+        if self.phase=='valid':
+            label = self.class_to_int_map[label]
+        label= torch.from_numpy(np.array([label]).astype('long'))
 
         if self.transform:
             image = self.transform(image)  # Apply transformations if any
