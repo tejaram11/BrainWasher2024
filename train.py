@@ -30,11 +30,11 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.5
+learning_rate=0.01
 step_size=25
 num_epochs=100
 
-margin = 0.2
+margin = 0.1
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
@@ -53,7 +53,7 @@ num_valid_triplets= 512
 batch_size=16
 num_workers=1
 load_best=False
-load_last=True
+load_last=False
 continue_step=False
 
 num_classes=10572
@@ -73,7 +73,7 @@ def main():
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
     
-    valid = pd.read_csv('log/valid.csv')
+    valid = pd.read_csv('log/train.csv')
     max_acc = valid['acc'].max()
     start_epoch=0
 
@@ -208,7 +208,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
 
-                margin = 0.2
+                margin = 0.1
                 # Calculate condition and move result to host CPU as NumPy array
                 margin = torch.tensor(margin)  # Assuming margin is a constant value
                 all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()

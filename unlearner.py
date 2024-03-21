@@ -14,7 +14,7 @@ from utils_inceptionresnetv2 import InceptionResNetV2
 #from facenet_pytorch import InceptionResnetV1
 
 
-trained_model_path='/kaggle/input/facenet-models/best_state_87.pth'
+trained_model_path='/kaggle/input/facenet-models/best_state_140.pth'
 trained_model=torch.load(trained_model_path)
 
 BrainWasher_Inception=BrainWasher()

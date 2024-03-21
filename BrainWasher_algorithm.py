@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 from train import train_valid, get_dataloader
 from torch.optim.lr_scheduler import CosineAnnealingLR,StepLR
 from loss import TripletLoss
+import time
 
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu' 
@@ -84,7 +85,9 @@ class BrainWasher:
             print('Valid')
             self.evaluation(net, validation_loader, criterion)
         net.train()
+        time0 = time.time()
         for sample in forget_loader: ##First Stage 
+            print("First stage")
             inputs = sample["image"]
             inputs = inputs.to(DEVICE)
             optimizer.zero_grad()
@@ -93,6 +96,7 @@ class BrainWasher:
             loss = self.kl_loss_sym(outputs, uniform_label) ##optimize the distance between logits and pseudo labels
             loss.backward()
             optimizer.step()
+            print(f'  Execution time                 = {time.time() - time0}')
         if self.USE_MOCK:
             print('Forget')
             self.evaluation(net,forget_loader,criterion)
@@ -100,6 +104,7 @@ class BrainWasher:
             self.evaluation(net, validation_loader,criterion)
             print(f'epoch={epochs} and retain batch_sz={retain_bs}') 
         net.train()
+        
         for ep in range(epochs): ##Second Stage 
             net.train()
             for sample_forget, sample_retain in zip(forget_loader, retain_ld4fgt):##Forget Round
