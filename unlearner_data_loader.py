@@ -59,7 +59,7 @@ def get_dataset(batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
         ])
         
         kaggle_dir='/kaggle/working/BrainWasher2024/'
-        dataset_dir="/kaggle/input/casia-webface/casia-webface"
+        dataset_dir="/kaggle/input/casia-webface/MS1M_112x112"
         valid_dataset_dir='/kaggle/input/cplfw/aligned'
         
         retain_csv='files/casia_retain_set.csv'
