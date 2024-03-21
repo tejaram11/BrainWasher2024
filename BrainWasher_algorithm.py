@@ -60,7 +60,7 @@ class BrainWasher:
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.SGD(net.parameters(), lr=0.005,
                               momentum=0.9, weight_decay=0)
-        optimizer_retain = optim.Adam(net.parameters(), lr=0.001*retain_bs/64, momentum=0.9, weight_decay=1e-2)
+        optimizer_retain = optim.SGD(net.parameters(), lr=0.001*retain_bs/64, momentum=0.9, weight_decay=1e-2)
         ##the learning rate is associated with the batchsize we used
         optimizer_forget = optim.SGD(net.parameters(), lr=3e-4, momentum=0.9, weight_decay=0)
         total_step = int(len(forget_loader)*epochs)
