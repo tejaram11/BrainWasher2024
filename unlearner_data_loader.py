@@ -19,7 +19,7 @@ import numpy as np
 class casia_dataset(Dataset):
     def __init__(self,root_dir, csv_file ,phase='train', transform=None):
         super().__init__()
-        self.data = pd.read_csv(csv_file)
+        self.data = pd.read_csv(csv_file,dtype={'id': object, 'name': object, 'class': object})
         self.root_dir = root_dir
         self.transform = transform
         if phase=='valid':
