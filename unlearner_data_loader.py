@@ -38,7 +38,7 @@ class casia_dataset(Dataset):
         #label = self.data.loc[idx, 'class']
         if self.phase=='valid':
             label = self.class_to_int_map[label]
-        label= torch.from_numpy(np.array([label]).astype('long'))
+        label= torch.from_numpy(np.array([label]).astype('str'))
 
         if self.transform:
             image = self.transform(image)  # Apply transformations if any
@@ -54,11 +54,12 @@ def get_dataset(batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
         # utils
         normalize = transforms.Compose([
             transforms.ToPILImage(),
+            #transforms.RandomRotation(15),
             transforms.RandomResizedCrop(299),
+            #transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
+                                 std=[0.229, 0.224, 0.225])])
         
         kaggle_dir='/kaggle/working/BrainWasher2024/'
         dataset_dir="/kaggle/input/casia-webface/MS1M_112x112"
