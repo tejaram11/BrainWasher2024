@@ -10,7 +10,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from train import train_valid, get_dataloader
+from train import train_valid
+from data_loader import get_dataloader
 from torch.optim.lr_scheduler import CosineAnnealingLR,StepLR
 from loss import TripletLoss
 import time
