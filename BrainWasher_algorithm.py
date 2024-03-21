@@ -32,11 +32,12 @@ class BrainWasher:
         for sample in dataloader:
             images, labels = sample['image'].to(device), sample['label'].to(device)
             _pred = net.forward_classifier(images)
-            print(_pred.shape)
-            print(labels.shape)
-            _pred=torch.argmax(_pred,dim=1)
+            
+            _pred=torch.argmax(_pred,dim=0)
             print(f'pred:{_pred}')
             print(f'label:{labels}')
+            print(_pred.shape)
+            print(labels.shape)
             total_samp+=len(labels)
             #print(f'total_samp={total_samp}')
             loss = criterion(_pred, labels)
