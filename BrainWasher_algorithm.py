@@ -31,7 +31,7 @@ class BrainWasher:
         total_loss = 0.0
         for sample in dataloader:
             images, labels = sample['image'].to(device), sample['label'].to(device)
-            _pred = net(images)
+            _pred = net.forward_classifier(images)
             total_samp+=len(labels)
             #print(f'total_samp={total_samp}')
             loss = criterion(_pred, labels)
