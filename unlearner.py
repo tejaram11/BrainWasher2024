@@ -15,12 +15,12 @@ from utils_inceptionresnetv2 import InceptionResNetV2
 
 
 trained_model_path='/kaggle/input/facenet-models/best_state_87.pth'
-        
+trained_model=torch.load(trained_model_path)
 
 BrainWasher_Inception=BrainWasher(USE_MOCK=True)
 model = InceptionResNetV2(10572)
 
-model.load_state_dict(trained_model_path['state_dict'])
+model.load_state_dict(trained_model['state_dict'])
 
 retain_loader,forget_loader,validation_loader= get_dataset(64)
 model_forget=BrainWasher_Inception.unlearning(model, retain_loader, forget_loader, validation_loader)
