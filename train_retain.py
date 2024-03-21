@@ -209,8 +209,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 
 
                 # choose the semi hard negatives only for "training"
-                pos_dist = l2_dist.forward(anc_embed, pos_embed)
-                neg_dist = l2_dist.forward(anc_embed, neg_embed)
+                pos_dist = compute_l2_distance(anc_embed, pos_embed)
+                neg_dist = compute_l2_distance(anc_embed, neg_embed)
 
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
