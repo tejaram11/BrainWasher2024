@@ -30,7 +30,7 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.05
+learning_rate=0.5
 step_size=25
 num_epochs=100
 
