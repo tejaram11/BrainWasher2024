@@ -14,7 +14,7 @@ from utils_inceptionresnetv2 import InceptionResNetV2
 from facenet_pytorch import InceptionResnetV1
 
 
-trained_model_path='/kaggle/input/models/20180408-102900-casia-webface.pt'
+trained_model_path='/kaggle/input/facenet-models/best_state_87.pth'
         
 
 BrainWasher_Inception=BrainWasher(USE_MOCK=True)
