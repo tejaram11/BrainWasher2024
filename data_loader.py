@@ -164,11 +164,11 @@ class TripletFaceDataset(Dataset):
         # Modified to open as PIL image in the first place
         
         temp=Image.open(anc_img).convert('RGB') 
-        anc_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else temp
+        anc_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else io.imread(anc_img)
         temp = Image.open(pos_img).convert('RGB')
-        pos_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else temp
+        pos_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else io.imread(pos_img)
         temp = Image.open(neg_img).convert('RGB')
-        neg_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else temp
+        neg_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else io.imread(neg_img)
         
         if self.phase=='valid':
             pos_class = self.class_to_int_map[pos_class]
