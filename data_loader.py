@@ -163,7 +163,7 @@ class TripletFaceDataset(Dataset):
 
         # Modified to open as PIL image in the first place
         anc_img = self.mtcnn(io.imread(anc_img)).squeeze(0)
-        print(anc_img.shape)
+        print("inside data loader",anc_img.shape)
         pos_img = self.mtcnn(io.imread(pos_img)).squeeze(0)
         neg_img = self.mtcnn(io.imread(neg_img)).squeeze(0)
         
