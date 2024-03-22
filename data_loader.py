@@ -7,6 +7,7 @@ from PIL import Image
 from skimage import io
 from torch.utils.data import Dataset
 from torchvision import transforms
+from facenet_pytorch import MTCNN
 #from mtcnn import MTCNN
 
 class TripletFaceDataset(Dataset):
@@ -40,6 +41,7 @@ class TripletFaceDataset(Dataset):
         self.epoch = epoch
         self.transform = transform
         self.phase=phase
+        self.mtcnn=MTCNN()
         if phase=='valid':
             self.class_to_int_map = {cls: i for i, cls in enumerate(self.df['class'].unique())}
 
@@ -160,9 +162,9 @@ class TripletFaceDataset(Dataset):
         neg_img = os.path.join(self.root_dir, str(neg_class), str(neg_id)+'.jpg')
 
         # Modified to open as PIL image in the first place
-        anc_img = io.imread(anc_img)
-        pos_img = io.imread(pos_img)
-        neg_img = io.imread(neg_img)
+        anc_img = self.mtcnn(io.imread(anc_img))
+        pos_img = self.mtcnn(io.imread(pos_img))
+        neg_img = self.mtcnn(io.imread(neg_img))
         
         if self.phase=='valid':
             pos_class = self.class_to_int_map[pos_class]

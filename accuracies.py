@@ -282,7 +282,7 @@ def score_unlearning_algorithm(
 
     retain_loader = data_loaders["retain"]
     forget_loader = data_loaders["forget"]
-    val_loader = data_loaders["validation"]
+    #val_loader = data_loaders["validation"]
     test_loader = data_loaders["testing"]
 
     #original_model = models["original"]
@@ -370,7 +370,7 @@ def score_unlearning_algorithm(
 data_loaders={
     'retain':retain_loader,
     'forget':forget_loader,
-    'validation':validation_loader,
+    #'validation':validation_loader,
     'testing':validation_loader
     }
 
@@ -390,6 +390,7 @@ if __name__ == "__main__":
         'retrained':retrained_model,
         'unlearned':unlearned_model}
     ret = score_unlearning_algorithm(data_loaders, pretrained_models)
+    print(ret)
 
 
 
