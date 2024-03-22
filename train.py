@@ -23,6 +23,7 @@ from torch.optim import lr_scheduler
 
 from utils import ModelSaver, init_log_just_created
 from utils_inceptionresnetv2 import InceptionResNetV2
+from models import FaceNetModel
 from loss import TripletLoss
 from data_loader import get_dataloader
 from eval_metrics import evaluate, plot_roc
@@ -44,7 +45,7 @@ torch.cuda.empty_cache()
 
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
+train_root_dir="/kaggle/input/casia-webface/casia-webface"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
@@ -129,11 +130,11 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_embed = neg_embed[hard_triplets]
 
                 anc_img = anc_img[hard_triplets]
-                model.forward_classifier(anc_img.to(device))
+                model.module.forward_classifier(anc_img.to(device))
                 anc_img = pos_img[hard_triplets]
-                model.forward_classifier(anc_img.to(device))
+                model.module.forward_classifier(anc_img.to(device))
                 anc_img = neg_img[hard_triplets]
-                model.forward_classifier(anc_img.to(device))
+                model.module.forward_classifier(anc_img.to(device))
 
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]
@@ -223,7 +224,8 @@ def main():
     start_epoch=0
 
 
-    model = InceptionResNetV2(num_classes)
+    model = FaceNetModel()
+    model.unfreeze_all()
     model.to(device)
     print(device)
     triplet_loss = TripletLoss(margin).to(device)    
