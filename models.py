@@ -32,7 +32,7 @@ class FaceNetModel(nn.Module):
             # nn.Linear(100352, 1024),
             # nn.BatchNorm1d(1024),
             # nn.ReLU(),
-            nn.Linear(100352, embedding_size))
+            nn.Linear(2048, embedding_size))
 
         self.model.classifier = nn.Linear(embedding_size, num_classes)
 
@@ -55,6 +55,7 @@ class FaceNetModel(nn.Module):
     # returns face embedding(embedding_size)
     def forward(self, x):
         x = self.cnn(x)
+        print(x.shape)
         x = self.model.fc(x)
 
         features = self.l2_norm(x)
