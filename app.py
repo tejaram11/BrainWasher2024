@@ -36,7 +36,7 @@ def load_model():
     model=InceptionResNetV2(num_classes=10572)
     best_model='E:/programmer me/unlearning/upto_epoch_100/kaggle/working/log/best_state.pth'
     unlearned_model='E:/programmer me/unlearning/models/unlearned_model.pth'
-    checkpoint=torch.load(unlearned_model,map_location=torch.device('cpu'))
+    checkpoint=torch.load(best_model,map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     return model
