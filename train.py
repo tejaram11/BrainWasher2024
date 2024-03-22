@@ -51,7 +51,7 @@ train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 12000
 num_valid_triplets= 512
-batch_size=256
+batch_size=128
 num_workers=1
 load_best=False
 load_last=False
@@ -82,7 +82,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print(phase)
 
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
-            if batch_idx % 100 == 0:  # Print every 100 batches
+            if batch_idx % 20 == 0:  # Print every 100 batches
                 #xm.master_print(met.metrics_report())
                 print(f"Batch [{batch_idx}/{len(dataloaders[phase])}]")
 
