@@ -160,7 +160,7 @@ class TripletFaceDataset(Dataset):
         anc_img = os.path.join(self.root_dir, str(pos_class), str(anc_id)+'.jpg')
         pos_img = os.path.join(self.root_dir, str(pos_class), str(pos_id)+'.jpg')
         neg_img = os.path.join(self.root_dir, str(neg_class), str(neg_id)+'.jpg')
-        #print(anc_img)
+        print(anc_img)
         # Modified to open as PIL image in the first place
         anc_img = self.mtcnn(Image.open(anc_img).convert('RGB'))
         #print("inside data loader",anc_img.shape)
