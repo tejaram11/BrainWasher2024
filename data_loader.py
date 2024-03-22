@@ -41,7 +41,7 @@ class TripletFaceDataset(Dataset):
         self.epoch = epoch
         self.transform = transform
         self.phase=phase
-        self.mtcnn=MTCNN()
+        self.mtcnn=MTCNN(image_size=112)
         if phase=='valid':
             self.class_to_int_map = {cls: i for i, cls in enumerate(self.df['class'].unique())}
 
