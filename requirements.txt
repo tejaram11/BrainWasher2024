@@ -10,3 +10,4 @@ scikit-learn
 visdom
 path
 multitasking
+facenet-pytorch
