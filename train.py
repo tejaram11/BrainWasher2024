@@ -35,7 +35,7 @@ learning_rate=0.075
 step_size=25
 num_epochs=50
 
-margin = 0.5
+margin = 0.2
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
@@ -49,7 +49,7 @@ train_root_dir="/kaggle/input/casia-webface/casia-webface"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
-num_train_triplets= 10000
+num_train_triplets= 12000
 num_valid_triplets= 512
 batch_size=64
 num_workers=1
@@ -112,7 +112,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
 
-                margin = 0.5
+                margin = 0.2
                 # Calculate condition and move result to host CPU as NumPy array
                 margin = torch.tensor(margin)  # Assuming margin is a constant value
                 all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
@@ -229,8 +229,9 @@ def main():
     model.unfreeze_all()
     model.to(device)
     print(device)
-    triplet_loss = TripletLoss(margin).to(device)    
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
+    triplet_loss = TripletLoss(margin).to(device)
+    optimizer=optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,momentum=0.9)
+    #optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
         print("Training interrupted. Saving model...")
