@@ -130,11 +130,11 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 neg_embed = neg_embed[hard_triplets]
 
                 anc_img = anc_img[hard_triplets]
-                model.module.forward_classifier(anc_img.to(device))
+                model.modules.forward_classifier(anc_img.to(device))
                 anc_img = pos_img[hard_triplets]
-                model.module.forward_classifier(anc_img.to(device))
+                model.modules.forward_classifier(anc_img.to(device))
                 anc_img = neg_img[hard_triplets]
-                model.module.forward_classifier(anc_img.to(device))
+                model.modules.forward_classifier(anc_img.to(device))
 
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]

@@ -55,7 +55,6 @@ class FaceNetModel(nn.Module):
     # returns face embedding(embedding_size)
     def forward(self, x):
         x = self.cnn(x)
-        print(x.shape)
         x = self.model.fc(x)
 
         features = self.l2_norm(x)
