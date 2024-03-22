@@ -162,10 +162,10 @@ class TripletFaceDataset(Dataset):
         neg_img = os.path.join(self.root_dir, str(neg_class), str(neg_id)+'.jpg')
         print(anc_img)
         # Modified to open as PIL image in the first place
-        anc_img = self.mtcnn(io.imread(anc_img))[0]
+        anc_img = self.mtcnn(Image.open(anc_img).convert('RGB'))[0]
         #print("inside data loader",anc_img.shape)
-        pos_img = self.mtcnn(io.imread(pos_img))[0]
-        neg_img = self.mtcnn(io.imread(neg_img))[0]
+        pos_img = self.mtcnn(Image.open(pos_img).convert('RGB'))[0]
+        neg_img = self.mtcnn(Image.open(neg_img).convert('RGB'))[0]
         
         if self.phase=='valid':
             pos_class = self.class_to_int_map[pos_class]
