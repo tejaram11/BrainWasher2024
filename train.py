@@ -89,6 +89,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
             anc_img = batch_sample['anc_img'].to(device)
             pos_img = batch_sample['pos_img'].to(device)
             neg_img = batch_sample['neg_img'].to(device)
+            print(anc_img.shape)
 
             #print("forward pass")
             #print(f'  Execution time                 = {time.time() - time0}')
