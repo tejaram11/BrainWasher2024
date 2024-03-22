@@ -10,7 +10,7 @@ from torchvision import transforms
 #from mtcnn import MTCNN
 
 class TripletFaceDataset(Dataset):
-    def __init__(self, root_dir, csv_name, phase, num_triplets, epoch, triplet_batch_size,num_human_identities_per_batch=32,
+    def __init__(self, root_dir, csv_name, phase, num_triplets, epoch, triplet_batch_size,num_human_identities_per_batch=64,
                   training_triplets_path=None, transform=None):
         """
         Args:
@@ -91,8 +91,8 @@ class TripletFaceDataset(Dataset):
                       - At least, two images needed for anchor and positive images in pos_class
                       - Negative image should have different class as anchor and positive images by definition
             """
-            classes_per_batch = np.random.choice(classes, size=self.num_human_identities_per_batch, replace=False)
-
+            #classes_per_batch = np.random.choice(classes, size=self.num_human_identities_per_batch, replace=False)
+            classes_per_batch=classes
             for triplet in range(self.triplet_batch_size):
 
                 pos_class = np.random.choice(classes_per_batch)

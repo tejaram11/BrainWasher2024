@@ -51,7 +51,7 @@ train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 12000
 num_valid_triplets= 512
-batch_size=64
+batch_size=128
 num_workers=1
 load_best=False
 load_last=False
@@ -106,16 +106,18 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 
 
                 # choose the semi hard negatives only for "training"
-                pos_dist = compute_l2_distance(anc_embed, pos_embed)
-                neg_dist = compute_l2_distance(anc_embed, neg_embed)
+                pos_dist = l2_dist.forward(anc_embed, pos_embed)
+                neg_dist = l2_dist.forward(anc_embed, neg_embed)
 
                 neg_dist = neg_dist.to(device)
                 pos_dist = pos_dist.to(device)
 
-                margin = 0.2
+                
                 # Calculate condition and move result to host CPU as NumPy array
-                margin = torch.tensor(margin)  # Assuming margin is a constant value
-                all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
+                # Assuming margin is a constant value
+                first_condition = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
+                second_condition = (pos_dist < neg_dist).cpu().numpy().flatten()
+                all = (np.logical_and(first_condition, second_condition))
                 all = torch.tensor(all)
                 #all = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
                 if phase == 'train':
@@ -232,6 +234,7 @@ def main():
     triplet_loss = TripletLoss(margin).to(device)
     #optimizer=optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,momentum=0.9)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
+    #optimizer = optim.Adagrad(params=model.parameters(), lr=learning_rate, lr_decay=0, initial_accumulator_value=0.1, eps=1e-10, weight_decay=1e-5)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
         print("Training interrupted. Saving model...")
