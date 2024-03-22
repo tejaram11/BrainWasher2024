@@ -63,103 +63,6 @@ unfreeze=[]
 #os.environ['PJRT_DEVICE']='TPU'
 
 #device=xm.xla_device()
-
-
-
-
-def main():
-    
-    
-    init_log_just_created("log/valid.csv")
-    init_log_just_created("log/train.csv")
-    
-    valid = pd.read_csv('log/valid.csv')
-    max_acc = valid['acc'].max()
-    start_epoch=0
-
-
-    model = InceptionResNetV2(num_classes)
-    model.to(device)
-    print(device)
-    triplet_loss = TripletLoss(margin).to(device)    
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
-    def handle_interrupt(signal, frame):
-        print("Training interrupted. Saving model...")
-        torch.save(model.state_dict(), "models/interrupted_model.pt")
-        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
-        print(epoch)
-        sys.exit(0)
-
-    # Register the Ctrl+C signal handler
-    signal.signal(signal.SIGINT, handle_interrupt)
-    
-    if load_best or load_last:
-        checkpoint = 'log/best_state.pth' if load_best else 'log/last_checkpoint.pth'
-        print('loading', checkpoint)
-        checkpoint = torch.load(checkpoint)
-        modelsaver.current_acc = max_acc
-        start_epoch = checkpoint['epoch'] + 1
-        model.load_state_dict(checkpoint['state_dict'])
-        print("Stepping scheduler")
-        
-        try:
-            optimizer.load_state_dict(checkpoint['optimizer_state'])
-        except ValueError as e:
-            print("Can't load last optimizer")
-            print(e)
-        
-        if continue_step:
-            scheduler.step(checkpoint['epoch'])
-        print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
-              f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
-              f"Loaded checkpoint loss: {checkpoint['loss']}")
-
-    
-    #try:
-     #model = torch.nn.DataParallel(model)
-    for epoch in range(start_epoch, num_epochs):
-        print(80 * '=')
-        print('Epoch [{}/{}]'.format(epoch, num_epochs))
-
-        time0 = time.time()
-        data_loaders, data_size = get_dataloader(train_root_dir, valid_root_dir,
-                                                 train_csv_name, valid_csv_name,
-                                                 num_train_triplets, num_valid_triplets,
-                                                 batch_size, num_workers,epoch)
-        #print("data loaded")
-        #print(f'  Execution time                 = {time.time() - time0}')
-        
-        train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
-        
-        print(f'  Execution time                 = {time.time() - time0}')
-    print(80 * '=')
-    
-    '''
-    #except:
-        print("Training excepted. Saving model...")
-        torch.save(model.state_dict(), "models/interrupted_model_except.pt")
-        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
-    '''
-        
-
-
-def save_last_checkpoint(state):
-    torch.save(state, "log/last_checkpoint.pth")
-
-def save_if_best(state, acc):
-    modelsaver.save_if_best(acc, state)
-
-def compute_l2_distance(x1, x2):
-  # Move tensors to TPU device
-  x1 = x1.to(device)
-  x2 = x2.to(device)
-
-  # Calculate squared Euclidean distance (L2 norm)
-  diff = x1 - x2
-  distances = torch.sum(diff * diff, dim=1)  # Sum squares along feature dimension
-  return distances
-    
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
      #time0 = time.time()
      for phase in ['train', 'valid']:
@@ -290,6 +193,104 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         else:
             plot_roc(fpr, tpr, figure_name='./log/roc_valid_epoch_{}.png'.format(epoch))
 
+def save_last_checkpoint(state):
+    torch.save(state, "log/last_checkpoint.pth")
+
+def save_if_best(state, acc):
+    modelsaver.save_if_best(acc, state)
+
+def compute_l2_distance(x1, x2):
+  # Move tensors to TPU device
+  x1 = x1.to(device)
+  x2 = x2.to(device)
+
+  # Calculate squared Euclidean distance (L2 norm)
+  diff = x1 - x2
+  distances = torch.sum(diff * diff, dim=1)  # Sum squares along feature dimension
+  return distances
+
+
+
+
+def main():
+    
+    
+    init_log_just_created("log/valid.csv")
+    init_log_just_created("log/train.csv")
+    
+    valid = pd.read_csv('log/valid.csv')
+    max_acc = valid['acc'].max()
+    start_epoch=0
+
+
+    model = InceptionResNetV2(num_classes)
+    model.to(device)
+    print(device)
+    triplet_loss = TripletLoss(margin).to(device)    
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
+    def handle_interrupt(signal, frame):
+        print("Training interrupted. Saving model...")
+        torch.save(model.state_dict(), "models/interrupted_model.pt")
+        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
+        print(epoch)
+        sys.exit(0)
+
+    # Register the Ctrl+C signal handler
+    signal.signal(signal.SIGINT, handle_interrupt)
+    
+    if load_best or load_last:
+        checkpoint = 'log/best_state.pth' if load_best else 'log/last_checkpoint.pth'
+        print('loading', checkpoint)
+        checkpoint = torch.load(checkpoint)
+        modelsaver.current_acc = max_acc
+        start_epoch = checkpoint['epoch'] + 1
+        model.load_state_dict(checkpoint['state_dict'])
+        print("Stepping scheduler")
+        
+        try:
+            optimizer.load_state_dict(checkpoint['optimizer_state'])
+        except ValueError as e:
+            print("Can't load last optimizer")
+            print(e)
+        
+        if continue_step:
+            scheduler.step(checkpoint['epoch'])
+        print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
+              f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
+              f"Loaded checkpoint loss: {checkpoint['loss']}")
+
+    
+    #try:
+     #model = torch.nn.DataParallel(model)
+    for epoch in range(start_epoch, num_epochs):
+        print(80 * '=')
+        print('Epoch [{}/{}]'.format(epoch, num_epochs))
+
+        time0 = time.time()
+        data_loaders, data_size = get_dataloader(train_root_dir, valid_root_dir,
+                                                 train_csv_name, valid_csv_name,
+                                                 num_train_triplets, num_valid_triplets,
+                                                 batch_size, num_workers,epoch)
+        #print("data loaded")
+        #print(f'  Execution time                 = {time.time() - time0}')
+        
+        train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
+        
+        print(f'  Execution time                 = {time.time() - time0}')
+    print(80 * '=')
+    
+    '''
+    #except:
+        print("Training excepted. Saving model...")
+        torch.save(model.state_dict(), "models/interrupted_model_except.pt")
+        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
+    '''
+        
+
+
+
+    
 
 if __name__ == '__main__':
     
