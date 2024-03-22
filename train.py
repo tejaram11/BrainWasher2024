@@ -31,7 +31,7 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.05
+learning_rate=0.075
 step_size=25
 num_epochs=50
 
@@ -49,9 +49,9 @@ train_root_dir="/kaggle/input/casia-webface/casia-webface"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
-num_train_triplets= 8192
+num_train_triplets= 10000
 num_valid_triplets= 512
-batch_size=16
+batch_size=64
 num_workers=1
 load_best=False
 load_last=False
