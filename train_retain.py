@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 21 21:19:57 2024
-
-@author: TEJA
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Tue Feb 27 10:55:08 2024
 
 @author: TEJA
@@ -37,7 +30,7 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.01
+learning_rate=0.05
 step_size=25
 num_epochs=100
 
@@ -51,7 +44,7 @@ torch.cuda.empty_cache()
 
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/casia-webface"
+train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_retain_set.csv"
 valid_csv_name= "files/lfwd.csv"
@@ -80,7 +73,7 @@ def main():
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
     
-    valid = pd.read_csv('log/train.csv')
+    valid = pd.read_csv('log/valid.csv')
     max_acc = valid['acc'].max()
     start_epoch=0
 
@@ -183,7 +176,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
             model.eval()
         
         print(phase)
-        torch.cuda.empty_cache()
+
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
             if batch_idx % 100 == 0:  # Print every 100 batches
                 #xm.master_print(met.metrics_report())

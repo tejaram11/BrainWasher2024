@@ -30,11 +30,11 @@ from write_csv_for_making_dataset import write_csv
 
 
 
-learning_rate=0.01
+learning_rate=0.05
 step_size=25
-num_epochs=100
+num_epochs=50
 
-margin = 0.1
+margin = 0.5
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
@@ -44,7 +44,7 @@ torch.cuda.empty_cache()
 
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/casia-webface"
+train_root_dir="/kaggle/input/casia-webface/MS1M_112x112"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/casia_full.csv"
 valid_csv_name= "files/lfwd.csv"
@@ -73,7 +73,7 @@ def main():
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
     
-    valid = pd.read_csv('log/train.csv')
+    valid = pd.read_csv('log/valid.csv')
     max_acc = valid['acc'].max()
     start_epoch=0
 
@@ -102,13 +102,13 @@ def main():
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
-        '''
+        
         try:
             optimizer.load_state_dict(checkpoint['optimizer_state'])
         except ValueError as e:
             print("Can't load last optimizer")
             print(e)
-        '''
+        
         if continue_step:
             scheduler.step(checkpoint['epoch'])
         print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
