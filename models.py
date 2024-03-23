@@ -32,7 +32,7 @@ class FaceNetModel(nn.Module):
             # nn.Linear(100352, 1024),
             # nn.BatchNorm1d(1024),
             # nn.ReLU(),
-            nn.Linear(51200, embedding_size))
+            nn.Linear(32678, embedding_size))
 
         self.model.classifier = nn.Linear(embedding_size, num_classes)
 

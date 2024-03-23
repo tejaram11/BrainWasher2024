@@ -11,7 +11,7 @@ from facenet_pytorch import MTCNN
 #from mtcnn import MTCNN
 
 class TripletFaceDataset(Dataset):
-    def __init__(self, root_dir, csv_name, phase, num_triplets, epoch, triplet_batch_size,num_human_identities_per_batch=105,
+    def __init__(self, root_dir, csv_name, phase, num_triplets, epoch, triplet_batch_size,num_human_identities_per_batch=64,
                   training_triplets_path=None, transform=None):
         """
         Args:
