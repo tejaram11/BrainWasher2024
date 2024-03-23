@@ -33,7 +33,7 @@ from write_csv_for_making_dataset import write_csv
 
 learning_rate=0.075
 step_size=25
-num_epochs=50
+num_epochs=100
 
 margin = 0.2
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
