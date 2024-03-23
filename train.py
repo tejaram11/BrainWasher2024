@@ -45,9 +45,9 @@ torch.cuda.empty_cache()
 
 
 kaggle_dir= "/kaggle/working/BrainWasher2024/"
-train_root_dir="/kaggle/input/casia-webface/casia-webface"
+train_root_dir="/kaggle/input/pins-face-recognition/105_classes_pins_dataset"
 valid_root_dir="/kaggle/input/cplfw/aligned"
-train_csv_name= "files/casia_full.csv"
+train_csv_name= "files/pins.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 20000
 num_valid_triplets= 512

@@ -11,7 +11,7 @@ from facenet_pytorch import MTCNN
 #from mtcnn import MTCNN
 
 class TripletFaceDataset(Dataset):
-    def __init__(self, root_dir, csv_name, phase, num_triplets, epoch, triplet_batch_size,num_human_identities_per_batch=64,
+    def __init__(self, root_dir, csv_name, phase, num_triplets, epoch, triplet_batch_size,num_human_identities_per_batch=105,
                   training_triplets_path=None, transform=None):
         """
         Args:
@@ -42,8 +42,8 @@ class TripletFaceDataset(Dataset):
         self.transform = transform
         self.phase=phase
         self.mtcnn=MTCNN(image_size=112)
-        if phase=='valid':
-            self.class_to_int_map = {cls: i for i, cls in enumerate(self.df['class'].unique())}
+        
+        self.class_to_int_map = {cls: i for i, cls in enumerate(self.df['class'].unique())}
 
         # Modified here to bypass having to use pandas.dataframe.loc for retrieving the class name
         #  and using dataframe.iloc for creating the face_classes dictionary
@@ -93,8 +93,8 @@ class TripletFaceDataset(Dataset):
                       - At least, two images needed for anchor and positive images in pos_class
                       - Negative image should have different class as anchor and positive images by definition
             """
-            #classes_per_batch = np.random.choice(classes, size=self.num_human_identities_per_batch, replace=False)
-            classes_per_batch=classes
+            classes_per_batch = np.random.choice(classes, size=self.num_human_identities_per_batch, replace=False)
+            #classes_per_batch=classes
             for triplet in range(self.triplet_batch_size):
 
                 pos_class = np.random.choice(classes_per_batch)
@@ -162,17 +162,20 @@ class TripletFaceDataset(Dataset):
         neg_img = os.path.join(self.root_dir, str(neg_class), str(neg_id)+'.jpg')
         #print(anc_img)
         # Modified to open as PIL image in the first place
-        
+        anc_img=io.imread(anc_img)
+        pos_img=io.imread(pos_img)
+        neg_img=io.imread(neg_img)
+        '''
         temp=Image.open(anc_img).convert('RGB') 
         anc_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else io.imread(anc_img)
         temp = Image.open(pos_img).convert('RGB')
         pos_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else io.imread(pos_img)
         temp = Image.open(neg_img).convert('RGB')
         neg_img = self.mtcnn(temp) if self.mtcnn(temp) is not None else io.imread(neg_img)
+        '''
         
-        if self.phase=='valid':
-            pos_class = self.class_to_int_map[pos_class]
-            neg_class = self.class_to_int_map[neg_class]
+        pos_class = self.class_to_int_map[pos_class]
+        neg_class = self.class_to_int_map[neg_class]
             
         pos_class = torch.from_numpy(np.array([pos_class]).astype('long'))
         neg_class = torch.from_numpy(np.array([neg_class]).astype('long'))
@@ -205,14 +208,14 @@ def get_dataloader(train_root_dir, valid_root_dir,
         'train': transforms.Compose([
             transforms.ToPILImage(),
             transforms.RandomRotation(15),
-            #transforms.RandomResizedCrop(199),
+            transforms.RandomResizedCrop(199),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])]),
         'valid': transforms.Compose([
             transforms.ToPILImage(),
-            transforms.RandomResizedCrop(112),
+            transforms.RandomResizedCrop(199),
             #transforms.CenterCrop(448),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],

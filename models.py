@@ -15,7 +15,7 @@ class FaceNetModel(nn.Module):
 
         self.model = resnet50(pretrained)
         embedding_size = 2048
-        num_classes = 10572
+        num_classes = 105
         self.cnn = nn.Sequential(
             self.model.conv1,
             self.model.bn1,
@@ -32,7 +32,7 @@ class FaceNetModel(nn.Module):
             # nn.Linear(100352, 1024),
             # nn.BatchNorm1d(1024),
             # nn.ReLU(),
-            nn.Linear(32768, embedding_size))
+            nn.Linear(100352, embedding_size))
 
         self.model.classifier = nn.Linear(embedding_size, num_classes)
 
