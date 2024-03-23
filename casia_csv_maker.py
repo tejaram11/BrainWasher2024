@@ -9,10 +9,10 @@ import os
 import csv
 
 # Define directory containing subdirectories
-root_dir = "E:/programmer me/unlearning/datasets/105_classes_pins_dataset"
+root_dir = "E:/programmer me/unlearning/datasets/cplfw_aligned"
 
 # Define output CSV file
-csv_file = "pins.csv"
+csv_file = "lfw.csv"
 
 csv_data = []
 
