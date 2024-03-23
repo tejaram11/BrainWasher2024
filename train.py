@@ -35,7 +35,7 @@ learning_rate=0.075
 step_size=25
 num_epochs=100
 
-margin = 0.4
+margin = 2
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
@@ -51,7 +51,7 @@ train_csv_name= "files/pins.csv"
 valid_csv_name= "files/lfwd.csv"
 num_train_triplets= 20000
 num_valid_triplets= 512
-batch_size=128
+batch_size=64
 num_workers=1
 load_best=False
 load_last=False
@@ -234,8 +234,8 @@ def main():
     print(device)
     triplet_loss = TripletLoss(margin).to(device)
     #optimizer=optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate,momentum=0.9)
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
-    #optimizer = optim.Adagrad(params=model.parameters(), lr=learning_rate, lr_decay=0, initial_accumulator_value=0.1, eps=1e-10, weight_decay=1e-5)
+    #optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate)
+    optimizer = optim.Adagrad(params=model.parameters(), lr=learning_rate, lr_decay=0, initial_accumulator_value=0.1, eps=1e-10)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
     def handle_interrupt(signal, frame):
         print("Training interrupted. Saving model...")
