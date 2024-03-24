@@ -65,13 +65,13 @@ def freeze_layers(model):
 
 # Step 4: Define loss and optimizer
 model = FaceNetModel()
-trained_model_path='/kaggle/input/pins-65-model/best_state.pth'
+trained_model_path='/kaggle/input/pins-65-model/last_checkpoint.pth'
 trained_model=torch.load(trained_model_path)
 model.load_state_dict(trained_model['state_dict'])
 
 freeze_layers(model)
 criterion = CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.075,momentum=0.9)
 
 train_ds=casia_dataset(root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset",
                        csv_file='files/pins.csv',
