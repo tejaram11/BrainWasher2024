@@ -76,7 +76,7 @@ criterion = CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.5,momentum=0.9)
 
 train_ds=casia_dataset(root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset",
-                       csv_file='files/pins.csv',
+                       csv_file='files/pins_retain_set.csv',
                        transform=normalize)
 train_loader = DataLoader(train_ds, batch_size=1024, shuffle=True)
 
