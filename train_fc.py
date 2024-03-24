@@ -37,7 +37,7 @@ class casia_dataset(Dataset):
         image = io.imread(img_path)  # Load image as RGB
         #label = self.data.loc[idx, 'class']
         label = self.class_to_int_map[label]
-        label= torch.from_numpy(np.array([label]).astype('int'))
+        label = torch.tensor(label, dtype=torch.long)
 
         if self.transform:
             image = self.transform(image)  # Apply transformations if any
