@@ -99,7 +99,7 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         outputs = model.forward_classifier(images)
         _, predicted = torch.max(outputs, 1)
-        loss = criterion(predicted, labels)
+        loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
         
