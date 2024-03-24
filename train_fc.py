@@ -93,14 +93,16 @@ for epoch in range(num_epochs):
     correct = 0
     total = 0
     for sample in tqdm(train_loader):
+        
         images, labels = sample['image'],sample['label']
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = model.forward_classifier(images)
-        loss = criterion(outputs, labels)
+        _, predicted = torch.max(outputs, 1)
+        loss = criterion(outputs, predicted)
         loss.backward()
         optimizer.step()
-        _, predicted = torch.max(outputs, 1)
+        
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
         
