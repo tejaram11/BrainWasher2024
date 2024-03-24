@@ -87,6 +87,7 @@ valid_loader = DataLoader(valid_ds, batch_size=1024, shuffle=True)
 num_epochs = 65
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
+best_acc= 0.0
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
@@ -110,9 +111,11 @@ for epoch in range(num_epochs):
     
     
     epoch_loss = running_loss / len(train_loader.dataset)
-    epoch_accuracy = correct / total
+    epoch_accuracy = 100*(correct / total)
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")
-    torch.save(model.state_dict(), f"log/{epoch}_checkpoint.pth")
+    if epoch_accuracy > best_acc:
+        best_acc=epoch_accuracy
+        torch.save(model.state_dict(), f"log/{epoch}_{best_acc}.pth")
         
 
 # Step 6: Evaluation (optional)
