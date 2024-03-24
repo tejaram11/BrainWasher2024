@@ -76,12 +76,12 @@ optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=
 train_ds=casia_dataset(root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset",
                        csv_file='files/pins.csv',
                        transform=normalize)
-train_loader = DataLoader(train_ds, batch_size=128, shuffle=True)
+train_loader = DataLoader(train_ds, batch_size=1024, shuffle=True)
 
 valid_ds=casia_dataset(root_dir="/kaggle/input/cplfw/aligned",
                        csv_file='files/lfwd.csv',
                        transform=normalize)
-valid_loader = DataLoader(valid_ds, batch_size=128, shuffle=True)
+valid_loader = DataLoader(valid_ds, batch_size=1024, shuffle=True)
 
 # Step 5: Training loop
 num_epochs = 65
