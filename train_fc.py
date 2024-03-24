@@ -62,7 +62,7 @@ def freeze_layers(model):
         param.requires_grad = False
     for param in model.model.classifier.parameters():
         param.requires_grad = True
-    for param in model.model.fc.parametes():
+    for param in model.model.fc.parameters():
         param.requires_grad=True
 
 # Step 4: Define loss and optimizer
