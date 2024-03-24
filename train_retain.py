@@ -49,12 +49,12 @@ train_root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset"
 valid_root_dir="/kaggle/input/cplfw/aligned"
 train_csv_name= "files/pins_retain_set.csv"
 valid_csv_name= "files/lfwd.csv"
-num_train_triplets= 30000
+num_train_triplets= 50000
 num_valid_triplets= 512
 batch_size=64
 num_workers=1
 load_best=False
-load_last=False
+load_last=True
 continue_step=False
 
 num_classes=10572
