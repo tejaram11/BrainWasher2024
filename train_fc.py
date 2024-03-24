@@ -67,7 +67,7 @@ def freeze_layers(model):
 
 # Step 4: Define loss and optimizer
 model = FaceNetModel()
-trained_model_path='/kaggle/input/pins-100-model/last_checkpoint.pth'
+trained_model_path='/kaggle/working/log/last_checkpoint.pth'
 trained_model=torch.load(trained_model_path)
 model.load_state_dict(trained_model['state_dict'])
 
