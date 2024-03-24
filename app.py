@@ -8,16 +8,19 @@ Created on Fri Mar 22 15:02:53 2024
 from flask import Flask, render_template, request
 import torch
 from torchvision import transforms
-from utils_inceptionresnetv2 import InceptionResNetV2
+from facenet_pytorch import MTCNN
+#from utils_inceptionresnetv2 import InceptionResNetV2
+from models import FaceNetModel
 from PIL import Image
 import base64
 import io
+mtcnn = MTCNN()
 
 app = Flask(__name__)
 
 preprocess=transforms.Compose([
     #transforms.ToPILImage(),
-    transforms.RandomResizedCrop(299),
+    transforms.RandomResizedCrop(199),
     #transforms.CenterCrop(448),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -33,10 +36,12 @@ def load_model():
     # model.eval()
     # return model
     
-    model=InceptionResNetV2(num_classes=10572)
-    best_model='E:/programmer me/unlearning/upto_epoch_100/kaggle/working/log/best_state.pth'
-    unlearned_model='E:/programmer me/unlearning/models/unlearned_model.pth'
-    checkpoint=torch.load(best_model,map_location=torch.device('cpu'))
+    model=FaceNetModel()
+    
+
+    best_model='E:/programmer me/unlearning/pins_upto_epoch_65/kaggle/working/log/best_state.pth'
+    unlearned_model='E:/programmer me/unlearning/pins_upto_epoch_65/kaggle/working/log/last_checkpoint.pth'
+    checkpoint=torch.load(unlearned_model,map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     return model
@@ -46,14 +51,18 @@ def load_model():
 def predict(image):
     # Load your model
     model = load_model()
-
+    #aligned=mtcnn(image)
     # Perform inference
     image=preprocess(image)
     image=torch.unsqueeze(image,dim=0)
-    embeddings = model.forward_classifier(image)
+    with torch.no_grad():
+        embeddings = model.forward_classifier(image)
+        #embeddings[0][19]=0.5
     probabilities = torch.softmax(embeddings, dim=1)
+    print(probabilities)
 
-    return probabilities
+    return embeddings
+    #return probabilities
 
 @app.route('/predict',methods=['POST'])
 def find_image():
@@ -76,8 +85,9 @@ def find_image():
         probabilities = probabilities.detach().numpy()
 
         # Display prediction (example: using argmax)
-        prediction = str(probabilities.argmax())
-
+        pred_1=str(probabilities.argmax())
+        prediction = str(probabilities)
+        prediction+=' '+pred_1
         # Convert image to base64 string for display
         buffered = io.BytesIO()
         image.save(buffered, format="JPEG")

@@ -65,8 +65,9 @@ class BrainWasher:
         """Simple unlearning by finetuning."""
         print('-----------------------------------')
         epochs = 8
-        retain_bs = 16
+        retain_bs = 64
         criterion = nn.CrossEntropyLoss()
+        margin= 0.7
         optimizer = optim.SGD(net.parameters(), lr=0.005,
                               momentum=0.9, weight_decay=0)
         optimizer_retain = optim.SGD(net.parameters(), lr=0.001*retain_bs/64, momentum=0.9, weight_decay=1e-2)
@@ -77,7 +78,7 @@ class BrainWasher:
         retain_ld4fgt = DataLoader(retain_loader.dataset, batch_size=retain_bs, shuffle=True)
         scheduler = CosineAnnealingLR(optimizer_forget, T_max=total_step, eta_min=1e-6)
         scheduler_finetune= StepLR(optimizer_retain,step_size=20, gamma=0.1)
-        triplet_loss=TripletLoss(0.5).to(DEVICE)
+        triplet_loss=TripletLoss(margin).to(DEVICE)
         net.to(DEVICE)
         if self.USE_MOCK: ##Use some Local Metric as reference
             net.eval()
@@ -131,8 +132,8 @@ class BrainWasher:
                                                      "/kaggle/input/cplfw/aligned",
                                                      "files/casia_retain_set.csv",
                                                      "files/lfwd.csv",
-                                                     8192, 512,
-                                                     16,1,ep)
+                                                     30000, 512,
+                                                     64,1,ep)
             train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,triplet_data_size)
                 
             '''

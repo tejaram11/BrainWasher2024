@@ -24,8 +24,7 @@ class casia_dataset(Dataset):
         self.root_dir = root_dir
         self.transform = transform
         self.phase=phase
-        if self.phase=='valid':
-            self.class_to_int_map = {cls: i for i, cls in enumerate(self.data['class'].unique())}
+        self.class_to_int_map = {cls: i for i, cls in enumerate(self.data['class'].unique())}
 
     def __len__(self):
         return len(self.data)
@@ -36,8 +35,7 @@ class casia_dataset(Dataset):
         img_path=os.path.join(self.root_dir,str(label),str(img_name)+'.jpg')
         image = io.imread(img_path)  # Load image as RGB
         #label = self.data.loc[idx, 'class']
-        if self.phase=='valid':
-            label = self.class_to_int_map[label]
+        label = self.class_to_int_map[label]
         label= torch.from_numpy(np.array([label]).astype('int'))
 
         if self.transform:
@@ -55,7 +53,7 @@ def get_dataset(batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
         normalize = transforms.Compose([
             transforms.ToPILImage(),
             #transforms.RandomRotation(15),
-            transforms.RandomResizedCrop(299),
+            transforms.RandomResizedCrop(199),
             #transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
