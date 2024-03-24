@@ -40,7 +40,8 @@ def accuracy(net, loader):
     """Return accuracy on a dataset given by the data loader."""
     correct = 0
     total = 0
-    for inputs, targets in tqdm(loader):
+    for sample in tqdm(loader):
+        inputs,targets = sample['image'], sample['label']
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
         outputs = net(inputs)
         _, predicted = outputs.max(1)
@@ -65,7 +66,8 @@ def compute_outputs(net, loader):
     
     all_outputs = []
     
-    for inputs, targets in tqdm(loader):
+    for sample in tqdm(loader):
+        inputs, targets = sample['image'],sample['label']
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
 
         logits = net(inputs).detach().cpu().numpy() # (batch_size, num_classes)
