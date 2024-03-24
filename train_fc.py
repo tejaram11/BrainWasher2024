@@ -106,9 +106,11 @@ for epoch in range(num_epochs):
         
         running_loss += loss.item() * images.size(0)
     
+    
     epoch_loss = running_loss / len(train_loader.dataset)
     epoch_accuracy = correct / total
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")
+    torch.save(model.state_dict(), f"log/{epoch}_checkpoint.pth")
         
 
 # Step 6: Evaluation (optional)
