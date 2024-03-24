@@ -67,13 +67,13 @@ def freeze_layers(model):
 
 # Step 4: Define loss and optimizer
 model = FaceNetModel()
-trained_model_path='/kaggle/working/log/fc_finetune.pth'
+trained_model_path='/kaggle/input/pins-100-model/last_checkpoint.pth'
 trained_model=torch.load(trained_model_path)
-model.load_state_dict(trained_model)
+model.load_state_dict(trained_model['state_dict'])
 
 freeze_layers(model)
 criterion = CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.075,momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.5,momentum=0.9)
 
 train_ds=casia_dataset(root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset",
                        csv_file='files/pins.csv',
@@ -101,8 +101,8 @@ for epoch in range(num_epochs):
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = model.forward_classifier(images)
-        _, predicted = torch.max(outputs, 1)
-        loss = criterion(outputs, labels)
+        _, predicted = torch.max(outputs, dim=1)
+        loss = criterion(predicted, labels)
         loss.backward()
         optimizer.step()
         
@@ -126,9 +126,10 @@ correct = 0
 total = 0
 with torch.no_grad():
     for sample in valid_loader:
+        images, labels = sample['image'], sample['label']
         images, labels = images.to(device), labels.to(device)
         outputs = model.forward_classifier(images)
-        _, predicted = torch.max(outputs.data, 1)
+        _, predicted = torch.max(outputs.data, dim=1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 accuracy = correct / total

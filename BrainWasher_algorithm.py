@@ -34,8 +34,7 @@ class BrainWasher:
         for sample in dataloader:
             images, labels = sample['image'].to(device), sample['label'].to(device)
             _pred = net.forward_classifier(images)
-            
-            _pred=torch.argmax(_pred,dim=0)
+            _pred=torch.argmax(_pred,dim=1)
             print(f'pred:{_pred}')
             print(f'label:{labels}')
             print(_pred.shape)
@@ -132,7 +131,7 @@ class BrainWasher:
                                                      "/kaggle/input/cplfw/aligned",
                                                      "files/casia_retain_set.csv",
                                                      "files/lfwd.csv",
-                                                     30000, 512,
+                                                     10000, 512,
                                                      64,1,ep)
             train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,triplet_data_size)
                 

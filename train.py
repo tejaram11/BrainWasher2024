@@ -54,7 +54,7 @@ num_valid_triplets= 512
 batch_size=64
 num_workers=1
 load_best=False
-load_last=False
+load_last=True
 continue_step=False
 
 num_classes=105
@@ -231,7 +231,7 @@ def main():
     start_epoch=0
 
 
-    model = FaceNetModel(pretrained=True)
+    model = FaceNetModel()
     model.unfreeze_all()
     model.to(device)
     print(device)
@@ -259,12 +259,13 @@ def main():
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
         
+        '''
         try:
             optimizer.load_state_dict(checkpoint['optimizer_state'])
         except ValueError as e:
             print("Can't load last optimizer")
             print(e)
-        
+        '''
         if continue_step:
             scheduler.step(checkpoint['epoch'])
         print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
