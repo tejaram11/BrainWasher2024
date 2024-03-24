@@ -231,7 +231,7 @@ def main():
     start_epoch=0
 
 
-    model = FaceNetModel()
+    model = FaceNetModel(pretrained=True)
     model.unfreeze_all()
     model.to(device)
     print(device)
