@@ -21,7 +21,8 @@ from sklearn.metrics import make_scorer, accuracy_score
 import torch
 from torch import nn
 #from torch import optim
-from torch.utils.data import DataLoader, Subset, random_split
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 import torchvision
 from torchvision import transforms
@@ -35,10 +36,11 @@ print("Running on device:", DEVICE.upper())
     
 
 def accuracy(net, loader):
+    print("calculating accuracy")
     """Return accuracy on a dataset given by the data loader."""
     correct = 0
     total = 0
-    for inputs, targets in loader:
+    for inputs, targets in tqdm(loader):
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
         outputs = net(inputs)
         _, predicted = outputs.max(1)
@@ -48,6 +50,7 @@ def accuracy(net, loader):
 
 
 def compute_outputs(net, loader):
+    print("retrieving outputs")
     """Auxiliary function to compute the logits for all datapoints.
     Does not shuffle the data, regardless of the loader.
     """
@@ -62,7 +65,7 @@ def compute_outputs(net, loader):
     
     all_outputs = []
     
-    for inputs, targets in loader:
+    for inputs, targets in tqdm(loader):
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
 
         logits = net(inputs).detach().cpu().numpy() # (batch_size, num_classes)
@@ -118,6 +121,7 @@ def logistic_regression_attack(
     Returns:
       fpr, fnr : float * float
     """
+    print("performing logistic regression attack")
     assert len(outputs_U) == len(outputs_R)
     
     samples = np.concatenate((outputs_R, outputs_U)).reshape((-1, 1))
@@ -151,6 +155,7 @@ def best_threshold_attack(
     Returns:
       fpr, fnr : list[float] * list[float]
     """
+    print("performing best threshold_attack")
     assert len(outputs_U) == len(outputs_R)
     
     samples = np.concatenate((outputs_R, outputs_U))
@@ -179,6 +184,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
     Returns:
       epsilon: float corresponding to the privacy degree of the particular example.
     """
+    
     assert len(fpr) == len(fnr)
     
     per_attack_epsilon = [0.]
@@ -195,7 +201,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
                 per_attack_epsilon.append(np.inf)
             else:
                 per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2]))
-            
+    print("epsilon s calculated!!")
     return np.nanmax(per_attack_epsilon)
 
 
@@ -230,7 +236,7 @@ def forgetting_quality(
       distribution of each model (N=512 in the case of the competition's leaderboard) 
     * 2nd dimension corresponds to the number of samples in the forget set (S).
     """
-    
+    print("identifying forgetting quality")
     # N = number of model samples
     # S = number of forget samples
     N, S = outputs_U.shape
@@ -264,14 +270,14 @@ def forgetting_quality(
     return F(np.array(epsilons))
 
 
-retain_loader,forget_loader,validation_loader= get_dataset(32)
+
 
 
 
 def score_unlearning_algorithm(
         data_loaders: dict, 
         models: dict, 
-        n: int = 10,
+        n: int = 1,
         delta: float = 0.01,
         f: Callable = cross_entropy_f,
         attacks: list[Callable] = [best_threshold_attack, logistic_regression_attack]
@@ -279,7 +285,7 @@ def score_unlearning_algorithm(
     
     # n=512 in the case of unlearn and n=1 in the
     # case of retrain, since we are only provided with one retrained model here
-
+    print("calculating unlearning score")
     retain_loader = data_loaders["retain"]
     forget_loader = data_loaders["forget"]
     #val_loader = data_loaders["validation"]
@@ -367,14 +373,17 @@ def score_unlearning_algorithm(
     }
 
 
-data_loaders={
-    'retain':retain_loader,
-    'forget':forget_loader,
-    #'validation':validation_loader,
-    'testing':validation_loader
-    }
 
 if __name__ == "__main__":
+    retain_loader,forget_loader,validation_loader= get_dataset(32)
+    data_loaders={
+        'retain':retain_loader,
+        'forget':forget_loader,
+        #'validation':validation_loader,
+        'testing':validation_loader
+        }
+
+    
     from utils_inceptionresnetv2 import InceptionResNetV2
     retrained_model = InceptionResNetV2(10572)
     unlearned_model = InceptionResNetV2(10572)
