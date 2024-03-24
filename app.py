@@ -38,11 +38,12 @@ def load_model():
     
     model=FaceNetModel()
     
-
+    
+    fc_model="E:/programmer me/unlearning/models/31_checkpoint.pth"
     best_model='E:/programmer me/unlearning/pins_upto_epoch_65/kaggle/working/log/best_state.pth'
     unlearned_model='E:/programmer me/unlearning/pins_upto_epoch_65/kaggle/working/log/last_checkpoint.pth'
-    checkpoint=torch.load(unlearned_model,map_location=torch.device('cpu'))
-    model.load_state_dict(checkpoint['state_dict'])
+    checkpoint=torch.load(fc_model,map_location=torch.device('cpu'))
+    model.load_state_dict(checkpoint)
     model.eval()
     return model
 
@@ -61,8 +62,8 @@ def predict(image):
     probabilities = torch.softmax(embeddings, dim=1)
     print(probabilities)
 
-    return embeddings
-    #return probabilities
+    #return embeddings
+    return probabilities
 
 @app.route('/predict',methods=['POST'])
 def find_image():

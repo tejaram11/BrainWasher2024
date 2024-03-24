@@ -71,7 +71,7 @@ model.load_state_dict(trained_model['state_dict'])
 
 freeze_layers(model)
 criterion = CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.75,momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.075,momentum=0.9)
 
 train_ds=casia_dataset(root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset",
                        csv_file='files/pins.csv',
@@ -115,7 +115,7 @@ for epoch in range(num_epochs):
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")
     if epoch_accuracy > best_acc:
         best_acc=epoch_accuracy
-        torch.save(model.state_dict(), f"log/{epoch}_{best_acc}.pth")
+        torch.save(model.state_dict(), f"log/fc_finetune.pth")
         
 
 # Step 6: Evaluation (optional)
