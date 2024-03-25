@@ -73,10 +73,10 @@ model.load_state_dict(trained_model['state_dict'])
 
 freeze_layers(model)
 criterion = CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.75,momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.75,momentum=0.95)
 
 train_ds=casia_dataset(root_dir="/kaggle/input/pins-aligned/105_classes_pins_dataset",
-                       csv_file='files/pins_retain_set.csv',
+                       csv_file='files/pins.csv',
                        transform=normalize)
 train_loader = DataLoader(train_ds, batch_size=1024, shuffle=True)
 
@@ -86,7 +86,7 @@ valid_ds=casia_dataset(root_dir="/kaggle/input/cplfw/aligned",
 valid_loader = DataLoader(valid_ds, batch_size=1024, shuffle=True)
 
 # Step 5: Training loop
-num_epochs = 100
+num_epochs = 200
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 best_acc= 0.0
