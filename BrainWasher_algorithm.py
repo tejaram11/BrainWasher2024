@@ -41,7 +41,7 @@ class BrainWasher:
             loss = criterion(_pred, labels)
             _, _pred = torch.max(_pred,1)
             total_loss += loss.item()
-            total_acc+=(_pred.max(1)[1] == labels).float().sum().item()
+            total_acc+=(_pred == labels).float().sum().item()
             #print(f'total_acc={total_acc}')
             #print(f'total_sample={total_samp}')
             mean_loss = total_loss / len(dataloader)
