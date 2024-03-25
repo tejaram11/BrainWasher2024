@@ -10,20 +10,21 @@ import torch
 #from torch.utils.data import DataLoader, Dataset
 from BrainWasher_algorithm import BrainWasher
 from unlearner_data_loader import get_dataset
-from utils_inceptionresnetv2 import InceptionResNetV2
+#from utils_inceptionresnetv2 import InceptionResNetV2
 from models import FaceNetModel
 #from facenet_pytorch import InceptionResnetV1
 
 
-trained_model_path='/kaggle/input/pins-65-model/best_state.pth'
-trained_model=torch.load(trained_model_path)
+
 
 
 BrainWasher_Inception=BrainWasher()
 #model = InceptionResNetV2(10572)
 model=FaceNetModel()
 
-model.load_state_dict(trained_model['state_dict'])
+trained_model_path='/kaggle/working/log/fc_finetune.pth'
+trained_model=torch.load(trained_model_path)
+model.load_state_dict(trained_model)
 
 retain_loader,forget_loader,validation_loader= get_dataset(64)
 model_forget=BrainWasher_Inception.unlearning(model, retain_loader, forget_loader, validation_loader)

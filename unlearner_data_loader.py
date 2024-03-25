@@ -36,7 +36,7 @@ class casia_dataset(Dataset):
         image = io.imread(img_path)  # Load image as RGB
         #label = self.data.loc[idx, 'class']
         label = self.class_to_int_map[label]
-        label= torch.from_numpy(np.array([label]).astype('int'))
+        label = torch.tensor(label, dtype=torch.long)
 
         if self.transform:
             image = self.transform(image)  # Apply transformations if any
@@ -52,7 +52,7 @@ def get_dataset(batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
         # utils
         normalize = transforms.Compose([
             transforms.ToPILImage(),
-            #transforms.RandomRotation(15),
+            transforms.RandomRotation(15),
             transforms.RandomResizedCrop(199),
             #transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),

@@ -15,6 +15,7 @@ from data_loader import get_dataloader
 from torch.optim.lr_scheduler import CosineAnnealingLR,StepLR
 from loss import TripletLoss
 import time
+from tqdm import tqdm
 
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu' 
@@ -34,14 +35,11 @@ class BrainWasher:
         for sample in dataloader:
             images, labels = sample['image'].to(device), sample['label'].to(device)
             _pred = net.forward_classifier(images)
-            _pred=torch.argmax(_pred,dim=1)
-            print(f'pred:{_pred}')
-            print(f'label:{labels}')
-            print(_pred.shape)
-            print(labels.shape)
+                       
             total_samp+=len(labels)
             #print(f'total_samp={total_samp}')
             loss = criterion(_pred, labels)
+            _, _pred = torch.max(_pred,1)
             total_loss += loss.item()
             total_acc+=(_pred.max(1)[1] == labels).float().sum().item()
             #print(f'total_acc={total_acc}')
@@ -63,6 +61,8 @@ class BrainWasher:
             ):
         """Simple unlearning by finetuning."""
         print('-----------------------------------')
+        for param in net.parameters():
+            param.requires_grad = True
         epochs = 8
         retain_bs = 64
         criterion = nn.CrossEntropyLoss()
@@ -88,12 +88,12 @@ class BrainWasher:
         net.train()
         time0 = time.time()
         print("First stage")
-        for sample in forget_loader: ##First Stage 
+        for sample in tqdm(forget_loader): ##First Stage 
             
             inputs = sample["image"]
             inputs = inputs.to(DEVICE)
             optimizer.zero_grad()
-            outputs = net(inputs)
+            outputs = net.forward_classifier(inputs)
             uniform_label = torch.ones_like(outputs).to(DEVICE) / outputs.shape[1] ##uniform pseudo label
             loss = self.kl_loss_sym(outputs, uniform_label) ##optimize the distance between logits and pseudo labels
             loss.backward()
@@ -111,9 +111,9 @@ class BrainWasher:
         for ep in range(epochs): ##Second Stage
             time0=time.time()
             net.train()
-            for sample_id,(sample_forget, sample_retain) in enumerate(zip(forget_loader, retain_ld4fgt)):##Forget Round
-                if sample_id%25==0:
-                    print(f'{sample_id}/{len(forget_loader)}')
+            for sample_id,(sample_forget, sample_retain) in tqdm(enumerate(zip(forget_loader, retain_ld4fgt))):##Forget Round
+                #if sample_id%25==0:
+                #    print(f'{sample_id}/{len(forget_loader)}')
                 t = 1.15 ##temperature coefficient
                 inputs_forget,inputs_retain = sample_forget["image"],sample_retain['image']
                 inputs_forget, inputs_retain = inputs_forget.to(DEVICE), inputs_retain.to(DEVICE)
@@ -131,7 +131,7 @@ class BrainWasher:
                                                      "/kaggle/input/cplfw/aligned",
                                                      "files/casia_retain_set.csv",
                                                      "files/lfwd.csv",
-                                                     10000, 512,
+                                                     30000, 512,
                                                      64,1,ep)
             train_valid(net,optimizer_retain,triplet_loss,scheduler_finetune,ep,triplet_loader,triplet_data_size)
                 
