@@ -69,7 +69,7 @@ def freeze_layers(model):
 model = FaceNetModel()
 trained_model_path='/kaggle/working/log/fc_finetune.pth'
 trained_model=torch.load(trained_model_path)
-model.load_state_dict(trained_model['state_dict'])
+model.load_state_dict(trained_model)
 
 freeze_layers(model)
 criterion = CrossEntropyLoss()
