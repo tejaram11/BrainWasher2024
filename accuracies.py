@@ -273,8 +273,8 @@ def forgetting_quality(
         pbar.set_description("Computing F...")
         
         sample_fprs, sample_fnrs = [], []
-        
-        for attack in attacks: 
+        try:
+         for attack in attacks: 
             uls = outputs_U[:, sample_id]
             rls = outputs_R[:, sample_id]
             
@@ -286,7 +286,10 @@ def forgetting_quality(
             else:
                 sample_fprs.append(fpr)
                 sample_fnrs.append(fnr)
-        
+        except ValueError as e:
+            
+            print(f"Skipping sample {sample_id} due to insufficient samples for attack: {e}")
+
         sample_epsilon = compute_epsilon_s(sample_fprs, sample_fnrs, delta=delta)
         epsilons.append(sample_epsilon)
         
