@@ -128,7 +128,7 @@ with torch.no_grad():
     for sample in valid_loader:
         images, labels = sample['image'], sample['label']
         images, labels = images.to(device), labels.to(device)
-        outputs = model.forward_classifier(images)
+        outputs = model(images)
         _, predicted = torch.max(outputs.data, dim=1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
