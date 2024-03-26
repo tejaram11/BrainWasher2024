@@ -377,7 +377,7 @@ def score_unlearning_algorithm(
 
 
 if __name__ == "__main__":
-    retain_loader,forget_loader,validation_loader= get_dataset(32)
+    retain_loader,forget_loader,validation_loader= get_dataset(512)
     data_loaders={
         'retain':retain_loader,
         'forget':forget_loader,
