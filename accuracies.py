@@ -197,10 +197,10 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
     
     assert len(fpr) == len(fnr)
     
-    per_attack_epsilon = []
+    per_attack_epsilon = [0.00000005]
     for fpr_i, fnr_i in zip(fpr, fnr):
         if fpr_i == 0 and fnr_i == 0:
-            per_attack_epsilon.append(0.00000005)
+            per_attack_epsilon.append(0)
         elif fpr_i == 0 or fnr_i == 0:
             pass # discard attack
         else:
