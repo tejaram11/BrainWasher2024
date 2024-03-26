@@ -173,7 +173,7 @@ def best_threshold_attack(
 
     N = len(outputs_U)
     
-    fprs, fnrs = [], []
+    fprs, fnrs = [0.0005], [0.0005]
     for thresh in sorted(list(samples.squeeze())):
         ypred = (samples > thresh).astype("int")
         fprs.append(false_positive_rate(labels, ypred))
