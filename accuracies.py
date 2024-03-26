@@ -208,9 +208,9 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
                 epsilon1 = np.log(1. - delta - fpr_i) - np.log(fnr_i)
                 epsilon2 = np.log(1. - delta - fnr_i) - np.log(fpr_i)
             if np.isnan(epsilon1) and np.isnan(epsilon2):
-                per_attack_epsilon.append(0.5)
+                per_attack_epsilon.append(np.inf)
             else:
-                per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2]))
+                per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2,0.05]))
     print("epsilon s calculated!!")
     return np.nanmax(per_attack_epsilon)
 
