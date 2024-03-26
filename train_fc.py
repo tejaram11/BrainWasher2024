@@ -100,7 +100,7 @@ for epoch in range(num_epochs):
         images, labels = sample['image'],sample['label']
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
-        outputs = model.forward_classifier(images)
+        outputs = model(images)
         _, predicted = torch.max(outputs,1)
         loss = criterion(outputs, labels)
         loss.backward()
