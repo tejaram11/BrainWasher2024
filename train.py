@@ -16,9 +16,7 @@ import torch
 import torch.optim as optim
 from torch.nn.modules.distance import PairwiseDistance
 from torch.optim import lr_scheduler
-#import torch_xla.core.xla_model as xm
-#import torch_xla.debug.metrics as met
-#from pretrainedmodels import inceptionresnetv2
+
 
 
 from utils import ModelSaver, init_log_just_created
@@ -61,52 +59,31 @@ num_classes=105
 unfreeze=[]
 
 
-#os.environ['PJRT_DEVICE']='TPU'
 
-#device=xm.xla_device()
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
-     #time0 = time.time()
      for phase in ['train', 'valid']:
-     #for phase in ['valid']:
-        
-
         labels, distances = [], []
         triplet_loss_sum = 0.0
 
         if phase == 'train':
-            
             model.train()
         else:
             model.eval()
-        
         print(phase)
-
         for batch_idx, batch_sample in enumerate(dataloaders[phase]):
             if batch_idx % 100 == 0:  # Print every 100 batches
-                #xm.master_print(met.metrics_report())
                 print(f"Batch [{batch_idx}/{len(dataloaders[phase])}]")
 
             anc_img = batch_sample['anc_img'].to(device)
             pos_img = batch_sample['pos_img'].to(device)
             neg_img = batch_sample['neg_img'].to(device)
-            
-
-            #print("forward pass")
-            #print(f'  Execution time                 = {time.time() - time0}')
-
-            # pos_cls = batch_sample['pos_class'].to(device)
-            # neg_cls = batch_sample['neg_class'].to(device)
-
+           
             with torch.set_grad_enabled(phase == 'train'):
 
                 # anc_embed, pos_embed and neg_embed are encoding(embedding) of image
                 anc_embed, pos_embed, neg_embed = model(anc_img), model(pos_img), model(neg_img)
                 
-                #print("gradient calc")
-                #print(f'  Execution time                 = {time.time() - time0}')
-                
-
-                # choose the semi hard negatives only for "training"
+                # choose the hard negatives only for "training"
                 pos_dist = l2_dist.forward(anc_embed, pos_embed)
                 neg_dist = l2_dist.forward(anc_embed, neg_embed)
 
@@ -121,7 +98,6 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 second_condition = (pos_dist < neg_dist).cpu().numpy().flatten()
                 all = (np.logical_and(first_condition, second_condition))
                 '''
-                
                 region = (neg_dist - pos_dist < margin).cpu().numpy().flatten()
                 region = torch.tensor(region)
                 if phase == 'train':
@@ -135,30 +111,15 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 pos_embed = pos_embed[hard_triplets]
                 neg_embed = neg_embed[hard_triplets]
                 
-                '''
-                anc_img = anc_img[hard_triplets]
-                model.modules.forward_classifier(anc_img.to(device))
-                anc_img = pos_img[hard_triplets]
-                model.modules.forward_classifier(anc_img.to(device))
-                anc_img = neg_img[hard_triplets]
-                model.modules.forward_classifier(anc_img.to(device))
-                '''
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]
-                
-                #print("gradients")
-                #print(f'  Execution time                 = {time.time() - time0}')
-                #print("loss calc")
                 triplet_loss = triploss.forward(anc_embed, pos_embed, neg_embed)
-                #print(f'  Execution time                 = {time.time() - time0}')
+                
 
                 if phase == 'train':
                     optimizer.zero_grad()
                     triplet_loss.backward()
                     optimizer.step()
-                    #xm.optimizer_step(optimizer)
-                    #print("backprop")
-                #print(f'  Execution time                 = {time.time() - time0}')
             
                 distances.append(pos_dist.data.cpu().numpy())
                 labels.append(np.ones(pos_dist.size(0)))
@@ -218,8 +179,6 @@ def compute_l2_distance(x1, x2):
   return distances
 
 
-
-
 def main():
     
     
@@ -229,7 +188,6 @@ def main():
     valid = pd.read_csv('log/valid.csv')
     max_acc = valid['acc'].max()
     start_epoch=0
-
 
     model = FaceNetModel()
     model.unfreeze_all()
@@ -259,22 +217,17 @@ def main():
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
         
-        '''
         try:
             optimizer.load_state_dict(checkpoint['optimizer_state'])
         except ValueError as e:
             print("Can't load last optimizer")
             print(e)
-        '''
         if continue_step:
             scheduler.step(checkpoint['epoch'])
         print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
               f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
               f"Loaded checkpoint loss: {checkpoint['loss']}")
 
-    
-    #try:
-     #model = torch.nn.DataParallel(model)
     for epoch in range(start_epoch, num_epochs):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, num_epochs))
@@ -284,28 +237,11 @@ def main():
                                                  train_csv_name, valid_csv_name,
                                                  num_train_triplets, num_valid_triplets,
                                                  batch_size, num_workers,epoch)
-        #print("data loaded")
-        #print(f'  Execution time                 = {time.time() - time0}')
         
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
         
         print(f'  Execution time                 = {time.time() - time0}')
     print(80 * '=')
-    
-    '''
-    #except:
-        print("Training excepted. Saving model...")
-        torch.save(model.state_dict(), "models/interrupted_model_except.pt")
-        torch.save(optimizer.state_dict(),"models/optimizer_state.pt")
-    '''
-        
-
-
-
-    
 
 if __name__ == '__main__':
-    
-    
-
     main()

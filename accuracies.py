@@ -283,10 +283,6 @@ def forgetting_quality(
     return F(np.array(epsilons))*delta
 
 
-
-
-
-
 def score_unlearning_algorithm(
         data_loaders: dict, 
         models: dict, 

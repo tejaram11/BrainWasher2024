@@ -6,7 +6,6 @@ Created on Mon Mar  4 12:44:58 2024
 """
 
 import torch
-
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -17,11 +16,8 @@ from loss import TripletLoss
 import time
 from tqdm import tqdm
 
-
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu' 
 print(DEVICE)
-
-
 
 class BrainWasher:
     def __init__(self,USE_MOCK=False):
