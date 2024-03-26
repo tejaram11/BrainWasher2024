@@ -254,7 +254,7 @@ def forgetting_quality(
     assert outputs_U.shape == outputs_R.shape, \
         "unlearn and retrain outputs need to be of the same shape"
     
-    epsilons = [0.5]
+    epsilons = []
     pbar = tqdm(range(S))
     for sample_id in pbar:
         pbar.set_description("Computing F...")
