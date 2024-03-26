@@ -128,13 +128,19 @@ def logistic_regression_attack(
     
     samples = np.concatenate((outputs_R, outputs_U)).reshape((-1, 1))
     labels = np.array([0] * len(outputs_R) + [1] * len(outputs_U))
-
+    
+    unique_labels, counts = np.unique(labels, return_counts=True)
+    labels_to_keep = unique_labels[counts > 1]
+    filter_mask = np.isin(labels, labels_to_keep)
+    filtered_samples = samples[filter_mask]
+    filtered_labels = labels[filter_mask]
+    
     attack_model = linear_model.LogisticRegression()
     cv = model_selection.StratifiedShuffleSplit(
         n_splits=n_splits, random_state=random_state
     )
     scores =  model_selection.cross_validate(
-        attack_model, samples, labels, cv=cv, scoring=SCORING)
+        attack_model, filtered_samples, filtered_labels, cv=cv, scoring=SCORING)
     
     fpr = np.mean(scores["test_false_positive_rate"])
     fnr = np.mean(scores["test_false_negative_rate"])
