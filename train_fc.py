@@ -86,7 +86,7 @@ valid_ds=casia_dataset(root_dir="/kaggle/input/cplfw/aligned",
 valid_loader = DataLoader(valid_ds, batch_size=1024, shuffle=True)
 
 # Step 5: Training loop
-num_epochs = 200
+num_epochs = 500
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 best_acc= 0.0
