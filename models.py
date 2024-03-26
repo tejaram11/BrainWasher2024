@@ -61,8 +61,8 @@ class FaceNetModel(nn.Module):
         # Multiply by alpha = 10 as suggested in https://arxiv.org/pdf/1703.09507.pdf
         alpha = 10
         features = features * alpha
-        res = self.model.classifier(features)
-        return res
+        #res = self.model.classifier(features)
+        return features
 
     def forward_classifier(self, x):
         features = self.forward(x)

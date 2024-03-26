@@ -63,7 +63,7 @@ class BrainWasher:
         print('-----------------------------------')
         for param in net.parameters():
             param.requires_grad = True
-        epochs = 8
+        epochs = 10
         retain_bs = 64
         criterion = nn.CrossEntropyLoss()
         margin= 0.7
