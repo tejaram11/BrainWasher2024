@@ -395,10 +395,10 @@ if __name__ == "__main__":
     retrained_model=FaceNetModel()
     unlearned_model=FaceNetModel
     retrain_model_path="/kaggle/input/pins-150-retain/fc_finetune_retain_final.pth"
-    unlearn_model_path="/kaggle/working/models/pins_unlearned_model.pth"
+    unlearn_model_path="/kaggle/working/log/last_checkpoint.pth"
     
     retrained_model.load_state_dict(torch.load(retrain_model_path))
-    unlearned_model.load_state_dict(torch.load(unlearn_model_path))
+    unlearned_model.load_state_dict(torch.load(unlearn_model_path)['state_dict'])
     pretrained_models={
         #'original':
         'retrained':retrained_model,
