@@ -55,7 +55,7 @@ def compute_outputs(net, loader):
     """Auxiliary function to compute the logits for all datapoints.
     Does not shuffle the data, regardless of the loader.
     """
-
+    i=0
     # Make sure loader does not shuffle the data
     if isinstance(loader.sampler, torch.utils.data.sampler.RandomSampler):
         loader = DataLoader(
@@ -70,8 +70,10 @@ def compute_outputs(net, loader):
         inputs, targets = sample['image'],sample['label']
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
 
-        logits = net(inputs).detach().cpu().numpy() # (batch_size, num_classes)
-        
+        logits = net(inputs).detach().cpu().numpy()# (batch_size, num_classes)
+        if i==0:
+            print(logits)
+            i+=1
         all_outputs.append(logits)
         
     return np.concatenate(all_outputs) # (len(loader.dataset), num_classes)
