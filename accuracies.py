@@ -304,7 +304,7 @@ def score_unlearning_algorithm(
     forget_accuracy = []
 
     pbar = tqdm(range(n))
-    for i in pbar:
+    for i in range(n):
         # unlearned model
         #u_model = deepcopy(original_model)
         # Execute the unlearing routine. This might take a few minutes.
