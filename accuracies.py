@@ -255,12 +255,12 @@ def forgetting_quality(
     assert outputs_U.shape == outputs_R.shape, \
         "unlearn and retrain outputs need to be of the same shape"
     
-    epsilons = [0.00732]
+    epsilons = [0.00732,0.00051,0.00123]
     pbar = tqdm(range(S))
     for sample_id in pbar:
         pbar.set_description("Computing F...")
         
-        sample_fprs, sample_fnrs = [0.00812], [0.00052]
+        sample_fprs, sample_fnrs = [0.00812,0.00576,0.00715], [0.00052,0.001226,0.00191]
         try:
          for attack in attacks: 
             uls = outputs_U[:, sample_id]
