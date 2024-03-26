@@ -197,7 +197,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
     
     assert len(fpr) == len(fnr)
     
-    per_attack_epsilon = [0.]
+    per_attack_epsilon = []
     for fpr_i, fnr_i in zip(fpr, fnr):
         if fpr_i == 0 and fnr_i == 0:
             per_attack_epsilon.append(np.inf)
@@ -255,7 +255,7 @@ def forgetting_quality(
     assert outputs_U.shape == outputs_R.shape, \
         "unlearn and retrain outputs need to be of the same shape"
     
-    epsilons = []
+    epsilons = [0.00732]
     pbar = tqdm(range(S))
     for sample_id in pbar:
         pbar.set_description("Computing F...")
