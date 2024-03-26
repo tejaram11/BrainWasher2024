@@ -280,7 +280,7 @@ def forgetting_quality(
         sample_epsilon = compute_epsilon_s(sample_fprs, sample_fnrs, delta=delta)
         epsilons.append(sample_epsilon)
         
-    return F(np.array(epsilons))
+    return F(np.array(epsilons))*delta
 
 
 
