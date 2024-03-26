@@ -275,7 +275,8 @@ def forgetting_quality(
                 sample_fprs.append(fpr)
                 sample_fnrs.append(fnr)
         except:
-            continue
+            pass
+        
         sample_epsilon = compute_epsilon_s(sample_fprs, sample_fnrs, delta=delta)
         epsilons.append(sample_epsilon)
         
