@@ -125,7 +125,7 @@ def logistic_regression_attack(
     Returns:
       fpr, fnr : float * float
     """
-    print("performing logistic regression attack")
+    #print("performing logistic regression attack")
     assert len(outputs_U) == len(outputs_R)
     
     samples = np.concatenate((outputs_R, outputs_U)).reshape((-1, 1))
