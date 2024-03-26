@@ -129,7 +129,13 @@ def logistic_regression_attack(
     samples = np.concatenate((outputs_R, outputs_U)).reshape((-1, 1))
     labels = np.array([0] * len(outputs_R) + [1] * len(outputs_U))
     
-    attack_model = linear_model.LogisticRegression()
+    attack_model = linear_model.LogisticRegression(
+    solver='saga',  # Try different solvers
+    multi_class='ovr',  # For binary classification
+    class_weight='balanced',  # Adjust weights for class imbalance
+    penalty='l2',  # Regularization type
+    C=0.1  # Regularization strength
+    )
     cv = model_selection.KFold(
         n_splits=n_splits
     )
