@@ -40,7 +40,7 @@ def accuracy(net, loader):
     """Return accuracy on a dataset given by the data loader."""
     correct = 0
     total = 0
-    for sample in tqdm(loader):
+    for sample in loader:
         inputs,targets = sample['image'], sample['label']
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
         outputs = net(inputs)
@@ -66,7 +66,7 @@ def compute_outputs(net, loader):
     
     all_outputs = []
     
-    for sample in tqdm(loader):
+    for sample in loader:
         inputs, targets = sample['image'],sample['label']
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
 
@@ -304,7 +304,7 @@ def score_unlearning_algorithm(
     forget_accuracy = []
 
     pbar = tqdm(range(n))
-    for i in range(n):
+    for i in pbar:
         # unlearned model
         #u_model = deepcopy(original_model)
         # Execute the unlearing routine. This might take a few minutes.
@@ -318,13 +318,13 @@ def score_unlearning_algorithm(
         # which for every datapoint is being cast to a scalar using the funtion f
         outputs_U.append( f(outputs_Ui) )
 
-        #pbar.set_description(f"Computing retain accuracy...")
+        pbar.set_description(f"Computing retain accuracy...")
         retain_accuracy.append(accuracy(u_model, retain_loader))
 
-        #pbar.set_description(f"Computing test accuracy...")
+        pbar.set_description(f"Computing test accuracy...")
         test_accuracy.append(accuracy(u_model, test_loader))
 
-        #pbar.set_description(f"Computing forget accuracy...")
+        pbar.set_description(f"Computing forget accuracy...")
         forget_accuracy.append(accuracy(u_model, forget_loader))
 
 
