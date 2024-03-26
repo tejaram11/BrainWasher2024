@@ -124,6 +124,7 @@ class BrainWasher:
                 optimizer_forget.step()
                 scheduler.step()
             print(f'  Execution time = {time.time() - time0}')
+            torch.cuda.empty_cache()
              ##Retain Round
             #triplet_loader = { x: torch.utils.data.DataLoader(x.dataset, batch_size=16, shuffle=False, num_workers=1) for x in [retain_loader, validation_loader]}
             #triplet_data_size = {x: len(x.dataset) for x in [retain_loader, validation_loader]}

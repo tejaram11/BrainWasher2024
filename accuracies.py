@@ -382,16 +382,19 @@ if __name__ == "__main__":
         'retain':retain_loader,
         'forget':forget_loader,
         #'validation':validation_loader,
-        'testing':validation_loader
+        'testing':retain_loader
         }
 
     
-    from utils_inceptionresnetv2 import InceptionResNetV2
-    retrained_model = InceptionResNetV2(10572)
-    unlearned_model = InceptionResNetV2(10572)
+    #from utils_inceptionresnetv2 import InceptionResNetV2
+    #retrained_model = InceptionResNetV2(10572)
+    #unlearned_model = InceptionResNetV2(10572)
     
+    from models import FaceNetModel
     
-    retrain_model_path=""
+    retrained_model=FaceNetModel()
+    unlearned_model=FaceNetModel
+    retrain_model_path="/kaggle/input/pins-150-retain/fc_finetune_retain_final.pth"
     unlearn_model_path=""
     
     retrained_model.load_state_dict(torch.load(retrain_model_path))
