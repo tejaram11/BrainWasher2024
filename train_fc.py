@@ -86,7 +86,7 @@ valid_ds=casia_dataset(root_dir="/kaggle/input/cplfw/aligned",
 valid_loader = DataLoader(valid_ds, batch_size=1024, shuffle=True)
 
 # Step 5: Training loop
-num_epochs = 500
+num_epochs = 50
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 best_acc= 0.0
@@ -117,7 +117,7 @@ for epoch in range(num_epochs):
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")
     if epoch_accuracy > best_acc:
         best_acc=epoch_accuracy
-        torch.save(model.state_dict(), f"log/fc_finetune.pth")
+        torch.save(model.state_dict(), "log/fc_finetune_unlearn.pth")
         
 
 # Step 6: Evaluation (optional)
