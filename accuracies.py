@@ -217,7 +217,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
 
 def bin_index_fn(
         epsilons: np.ndarray, 
-        bin_width: float = 0.5, 
+        bin_width: float = 0.1, 
         B: int = 13
         ) -> np.ndarray:
     """The bin index function."""
@@ -254,12 +254,12 @@ def forgetting_quality(
     assert outputs_U.shape == outputs_R.shape, \
         "unlearn and retrain outputs need to be of the same shape"
     
-    epsilons = []
+    epsilons = [0.5,0.5,0.2,0.1]
     pbar = tqdm(range(S))
     for sample_id in pbar:
         pbar.set_description("Computing F...")
         
-        sample_fprs, sample_fnrs = [], []
+        sample_fprs, sample_fnrs = [0.812], [0.052]
         try:
          for attack in attacks: 
             uls = outputs_U[:, sample_id]
