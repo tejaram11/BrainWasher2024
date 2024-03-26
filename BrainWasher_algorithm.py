@@ -129,7 +129,7 @@ class BrainWasher:
             #triplet_data_size = {x: len(x.dataset) for x in [retain_loader, validation_loader]}
             triplet_loader, triplet_data_size = get_dataloader("/kaggle/input/pins-aligned/105_classes_pins_dataset",
                                                      "/kaggle/input/cplfw/aligned",
-                                                     "files/casia_retain_set.csv",
+                                                     "files/pins_retain_set.csv",
                                                      "files/lfwd.csv",
                                                      30000, 512,
                                                      64,1,ep)
