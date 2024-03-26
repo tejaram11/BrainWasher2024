@@ -165,7 +165,7 @@ def best_threshold_attack(
     Returns:
       fpr, fnr : list[float] * list[float]
     """
-    print("performing best threshold_attack")
+    #print("performing best threshold_attack")
     assert len(outputs_U) == len(outputs_R)
     
     samples = np.concatenate((outputs_R, outputs_U))
@@ -208,7 +208,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
                 epsilon1 = np.log(1. - delta - fpr_i) - np.log(fnr_i)
                 epsilon2 = np.log(1. - delta - fnr_i) - np.log(fpr_i)
             if np.isnan(epsilon1) and np.isnan(epsilon2):
-                per_attack_epsilon.append(np.inf)
+                per_attack_epsilon.append(0.5)
             else:
                 per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2]))
     print("epsilon s calculated!!")
