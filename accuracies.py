@@ -112,55 +112,34 @@ def cross_entropy_f(x):
     return fn(x, pred).numpy()
 
 def logistic_regression_attack(
-    outputs_U, outputs_R, n_splits=2, random_state=0
-):
+        outputs_U, outputs_R, n_splits=2, random_state=0):
     """Computes cross-validation score of a membership inference attack.
 
     Args:
-        outputs_U: numpy array of shape (N)
-        outputs_R: numpy array of shape (N)
-        n_splits: int (default: 2)
-            Number of splits to use in the cross-validation.
-        random_state: int (default: 0)
-            Controls randomness of shuffling and splitting.
-
+      outputs_U: numpy array of shape (N)
+      outputs_R: numpy array of shape (N)
+      n_splits: int
+        number of splits to use in the cross-validation.
     Returns:
-        fpr, fnr: float, float
-            False positive rate (FPR) and false negative rate (FNR) of the attack.
-
-    Raises:
-        ValueError: If no classes have at least 2 samples after filtering.
+      fpr, fnr : float * float
     """
-
-    print("Performing logistic regression attack")
+    print("performing logistic regression attack")
     assert len(outputs_U) == len(outputs_R)
-
+    
     samples = np.concatenate((outputs_R, outputs_U)).reshape((-1, 1))
     labels = np.array([0] * len(outputs_R) + [1] * len(outputs_U))
-
-    # Check for classes with less than 2 samples
-    unique_labels, counts = np.unique(labels, return_counts=True)
-    classes_to_keep = unique_labels[counts >= 2]
-
-    # Handle the case where no classes have at least 2 samples
-    if len(classes_to_keep) == 0:
-        raise ValueError("No classes have at least 2 samples. Consider collecting more data or adjusting the attack strategy.")
-
-    filter_mask = np.isin(labels, classes_to_keep)
-    filtered_samples = samples[filter_mask]
-    filtered_labels = labels[filter_mask]
-
+    
     attack_model = linear_model.LogisticRegression()
-    cv = model_selection.StratifiedShuffleSplit(n_splits=n_splits, random_state=random_state)
-    scores = model_selection.cross_validate(
-        attack_model, filtered_samples, filtered_labels, cv=cv, scoring=SCORING
+    cv = model_selection.KFold(
+        n_splits=n_splits, random_state=random_state
     )
-
+    scores =  model_selection.cross_validate(
+        attack_model, samples, labels, cv=cv, scoring=SCORING)
+    
     fpr = np.mean(scores["test_false_positive_rate"])
     fnr = np.mean(scores["test_false_negative_rate"])
-
+    
     return fpr, fnr
-
 
 
 def best_threshold_attack(
@@ -273,8 +252,8 @@ def forgetting_quality(
         pbar.set_description("Computing F...")
         
         sample_fprs, sample_fnrs = [], []
-        try:
-         for attack in attacks: 
+        
+        for attack in attacks: 
             uls = outputs_U[:, sample_id]
             rls = outputs_R[:, sample_id]
             
@@ -286,10 +265,7 @@ def forgetting_quality(
             else:
                 sample_fprs.append(fpr)
                 sample_fnrs.append(fnr)
-        except ValueError as e:
-            
-            print(f"Skipping sample {sample_id} due to insufficient samples for attack: {e}")
-
+        
         sample_epsilon = compute_epsilon_s(sample_fprs, sample_fnrs, delta=delta)
         epsilons.append(sample_epsilon)
         
