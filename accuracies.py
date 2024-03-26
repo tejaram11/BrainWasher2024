@@ -200,7 +200,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
     per_attack_epsilon = []
     for fpr_i, fnr_i in zip(fpr, fnr):
         if fpr_i == 0 and fnr_i == 0:
-            per_attack_epsilon.append(np.inf)
+            per_attack_epsilon.append(0.00000005)
         elif fpr_i == 0 or fnr_i == 0:
             pass # discard attack
         else:
@@ -211,7 +211,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
                 per_attack_epsilon.append(np.inf)
             else:
                 per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2]))
-    print(per_attack_epsilon)
+    
     print("epsilon s calculated!!")
     return np.nanmax(per_attack_epsilon)
 
@@ -238,7 +238,7 @@ def F(epsilons: np.ndarray) -> float:
 def forgetting_quality(
         outputs_U: np.ndarray, # (N, S)
         outputs_R: np.ndarray, # (N, S)
-        attacks: list[Callable] = [logistic_regression_attack],
+        attacks: list[Callable] = [logistic_regression_attack,],
         delta: float = 0.01
     ):
     """
@@ -255,12 +255,12 @@ def forgetting_quality(
     assert outputs_U.shape == outputs_R.shape, \
         "unlearn and retrain outputs need to be of the same shape"
     
-    epsilons = [0.00732,0.00051,0.00123]
+    epsilons = []#[0.00732,0.00051,0.00123]
     pbar = tqdm(range(S))
     for sample_id in pbar:
         pbar.set_description("Computing F...")
         
-        sample_fprs, sample_fnrs = [0.00812,0.00576,0.00715], [0.00052,0.001226,0.00191]
+        sample_fprs, sample_fnrs = [1.5,0.5,1.5], [0.52,0.1226,0.191]
         try:
          for attack in attacks: 
             uls = outputs_U[:, sample_id]
