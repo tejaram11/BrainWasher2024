@@ -210,7 +210,8 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
             if np.isnan(epsilon1) and np.isnan(epsilon2):
                 per_attack_epsilon.append(np.inf)
             else:
-                per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2,0.05]))
+                per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2]))
+    print(per_attack_epsilon)
     print("epsilon s calculated!!")
     return np.nanmax(per_attack_epsilon)
 
