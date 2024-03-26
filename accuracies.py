@@ -131,7 +131,7 @@ def logistic_regression_attack(
     
     attack_model = linear_model.LogisticRegression()
     cv = model_selection.KFold(
-        n_splits=n_splits, random_state=random_state
+        n_splits=n_splits
     )
     scores =  model_selection.cross_validate(
         attack_model, samples, labels, cv=cv, scoring=SCORING)
