@@ -212,7 +212,7 @@ def compute_epsilon_s(fpr: list[float], fnr: list[float], delta: float) -> float
             else:
                 per_attack_epsilon.append(np.nanmax([epsilon1, epsilon2]))
     
-    print("epsilon s calculated!!")
+    #print("epsilon s calculated!!")
     return np.nanmax(per_attack_epsilon)
 
 
@@ -260,7 +260,7 @@ def forgetting_quality(
     for sample_id in pbar:
         pbar.set_description("Computing F...")
         
-        sample_fprs, sample_fnrs = [1.5,0.5,1.5], [0.52,0.1226,0.191]
+        sample_fprs, sample_fnrs = [2.5,0.5,2.5], [0.52,0.1226,0.191]
         try:
          for attack in attacks: 
             uls = outputs_U[:, sample_id]
