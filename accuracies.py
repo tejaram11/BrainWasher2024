@@ -399,6 +399,8 @@ if __name__ == "__main__":
     
     retrained_model.load_state_dict(torch.load(retrain_model_path))
     unlearned_model.load_state_dict(torch.load(unlearn_model_path))
+    retrained_model.to(DEVICE)
+    unlearned_model.to(DEVICE)
     pretrained_models={
         #'original':
         'retrained':retrained_model,
