@@ -309,7 +309,7 @@ def score_unlearning_algorithm(
         # Execute the unlearing routine. This might take a few minutes.
         # If run on colab, be sure to be running it on  an instance with GPUs
 
-        pbar.set_description(f"Unlearning...")
+        #pbar.set_description(f"Unlearning...")
         #u_model = unlearning(u_model, retain_loader, forget_loader, val_loader)
 
         outputs_Ui = compute_outputs(u_model, forget_loader) 
@@ -317,13 +317,13 @@ def score_unlearning_algorithm(
         # which for every datapoint is being cast to a scalar using the funtion f
         outputs_U.append( f(outputs_Ui) )
 
-        pbar.set_description(f"Computing retain accuracy...")
+        #pbar.set_description(f"Computing retain accuracy...")
         retain_accuracy.append(accuracy(u_model, retain_loader))
 
-        pbar.set_description(f"Computing test accuracy...")
+        #pbar.set_description(f"Computing test accuracy...")
         test_accuracy.append(accuracy(u_model, test_loader))
 
-        pbar.set_description(f"Computing forget accuracy...")
+        #pbar.set_description(f"Computing forget accuracy...")
         forget_accuracy.append(accuracy(u_model, forget_loader))
 
 
