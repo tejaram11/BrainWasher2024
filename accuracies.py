@@ -287,6 +287,7 @@ def score_unlearning_algorithm(
     
     # n=512 in the case of unlearn and n=1 in the
     # case of retrain, since we are only provided with one retrained model here
+    torch.cuda.empty_cache()
     print("calculating unlearning score")
     retain_loader = data_loaders["retain"]
     forget_loader = data_loaders["forget"]
