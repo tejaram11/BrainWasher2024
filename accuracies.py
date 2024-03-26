@@ -138,8 +138,8 @@ def logistic_regression_attack(
     penalty='l2',  # Regularization type
     C=0.1  # Regularization strength
     )
-    cv = model_selection.KFold(
-        n_splits=n_splits
+    cv = model_selection.StratifiedShuffleSplit(
+        n_splits=n_splits, random_state=random_state
     )
     scores =  model_selection.cross_validate(
         attack_model, samples, labels, cv=cv, scoring=SCORING,error_score='raise')
