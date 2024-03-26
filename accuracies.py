@@ -134,7 +134,7 @@ def logistic_regression_attack(
         n_splits=n_splits
     )
     scores =  model_selection.cross_validate(
-        attack_model, samples, labels, cv=cv, scoring=SCORING)
+        attack_model, samples, labels, cv=cv, scoring=SCORING,error_score='raise')
     
     fpr = np.mean(scores["test_false_positive_rate"])
     fnr = np.mean(scores["test_false_negative_rate"])
