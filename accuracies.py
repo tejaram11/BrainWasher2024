@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 
 from sklearn import linear_model, model_selection
-from sklearn.metrics import make_scorer, accuracy_score
+from sklearn.metrics import make_scorer
 
 import torch
 from torch import nn
@@ -24,10 +24,6 @@ from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import torchvision
-from torchvision import transforms
-from torchvision.utils import make_grid
-from torchvision.models import resnet18
 
 from unlearner_data_loader import get_dataset
 
@@ -55,7 +51,7 @@ def compute_outputs(net, loader):
     """Auxiliary function to compute the logits for all datapoints.
     Does not shuffle the data, regardless of the loader.
     """
-    i=0
+    
     # Make sure loader does not shuffle the data
     if isinstance(loader.sampler, torch.utils.data.sampler.RandomSampler):
         loader = DataLoader(
@@ -71,9 +67,7 @@ def compute_outputs(net, loader):
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
 
         logits = net(inputs).detach().cpu().numpy()# (batch_size, num_classes)
-        if i==0:
-            print(logits)
-            i+=1
+        
         all_outputs.append(logits)
         
     return np.concatenate(all_outputs) # (len(loader.dataset), num_classes)
@@ -415,39 +409,4 @@ if __name__ == "__main__":
         'unlearned':unlearned_model}
     ret = score_unlearning_algorithm(data_loaders, pretrained_models)
     print(ret)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
