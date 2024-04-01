@@ -7,12 +7,12 @@ Created on Mon Mar  4 15:37:06 2024
 
 
 import torch 
-#from torch.utils.data import DataLoader, Dataset
+
 from BrainWasher_algorithm import BrainWasher
 from unlearner_data_loader import get_dataset
 #from utils_inceptionresnetv2 import InceptionResNetV2
 from models import FaceNetModel
-#from facenet_pytorch import InceptionResnetV1
+
 
 
 

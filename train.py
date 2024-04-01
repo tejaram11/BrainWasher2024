@@ -52,7 +52,7 @@ num_valid_triplets= 512
 batch_size=64
 num_workers=1
 load_best=False
-load_last=True
+load_last=False
 continue_step=False
 
 num_classes=105
